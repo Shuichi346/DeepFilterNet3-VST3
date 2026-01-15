@@ -19,7 +19,7 @@ A real-time noise reduction VST3 plugin using [DeepFilterNet3](https://github.co
 
 ### Pre-built Binaries
 
-Download the latest version from [Releases](https://github.com/YOUR_USERNAME/deepfilter-vst/releases).
+Download the latest version from [Releases](https://github.com/Shuichi346/DeepFilterNet3-VST3/releases).
 
 #### macOS
 
