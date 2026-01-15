@@ -55,7 +55,7 @@ cp -r deepfilter-vst.vst3 ~/.vst3/
 **ビルド手順:**
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/deepfilter-vst.git
+git clone https://github.com/Shuichi346/DeepFilterNet3-VST3
 cd deepfilter-vst
 cargo xtask bundle deepfilter-vst --release
 ```
