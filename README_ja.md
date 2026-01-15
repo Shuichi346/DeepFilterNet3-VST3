@@ -42,9 +42,11 @@ cp -r deepfilter-vst.vst3 ~/Library/Audio/Plug-Ins/VST3/
 xattr -cr path/to/deepfilter-vst.vst3
 ```
 
+### Apple siliconのmacOS以外の場合
+ビルド後、deepfilter-vst.vst3を以下のパスにコピーしてください：
+
 #### Windows
 
-`deepfilter-vst.vst3` フォルダを以下のパスにコピーしてください。
 ```text
 C:\Program Files\Common Files\VST3\
 ```
