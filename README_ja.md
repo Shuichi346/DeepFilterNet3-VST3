@@ -37,6 +37,11 @@ cp -r deepfilter-vst.vst3 ~/Library/Audio/Plug-Ins/VST3/
 初回起動時にセキュリティ警告が表示される場合があります。
 「システム設定 → プライバシーとセキュリティ」から許可してください。
 
+**または:**
+```bash
+xattr -cr path/to/deepfilter-vst.vst3
+```
+
 #### Windows
 
 `deepfilter-vst.vst3` フォルダを以下のパスにコピーしてください。
