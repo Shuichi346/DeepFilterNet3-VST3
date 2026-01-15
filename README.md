@@ -33,6 +33,10 @@ sudo cp -r deepfilter-vst.vst3 /Library/Audio/Plug-Ins/VST3/
 cp -r deepfilter-vst.vst3 ~/Library/Audio/Plug-Ins/VST3/
 ```
 
+#### Note for macOS
+
+A security warning may appear during initial launch. Please allow it via System Settings → Privacy & Security.
+
 #### Windows
 
 Copy the `deepfilter-vst.vst3` folder to the following path:
