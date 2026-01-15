@@ -18,7 +18,7 @@
 
 ### ビルド済みプラグイン
 
-[Releases](https://github.com/YOUR_USERNAME/deepfilter-vst/releases) からダウンロードしてください。
+[Releases](https://github.com/Shuichi346/DeepFilterNet3-VST3/releases) からダウンロードしてください。
 
 #### macOS
 
