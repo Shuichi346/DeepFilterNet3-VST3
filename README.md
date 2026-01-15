@@ -42,9 +42,11 @@ A security warning may appear during initial launch. Please allow it via System 
 xattr -cr path/to/deepfilter-vst.vst3
 ```
 
+### Other than Apple silicon macOS.
+After building, copy deepfilter-vst.vst3 to the following path:
+
 #### Windows
 
-Copy the `deepfilter-vst.vst3` folder to the following path:
 ```text
 C:\Program Files\Common Files\VST3\
 ```
