@@ -1,0 +1,3 @@
+cargo clean
+
+cargo xtask bundle deepfilter-vst --release
