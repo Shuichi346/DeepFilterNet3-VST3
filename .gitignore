@@ -1,0 +1,14 @@
+# ビルド成果物
+/target/
+
+# macOS
+.DS_Store
+*.swp
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Cargo.lock はライブラリでは除外することもあるが、アプリケーションでは含める
+# 今回は含める（再現性のため）

@@ -1,0 +1,19 @@
+[package]
+name = "deepfilter-vst"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+nih_plug = { git = "https://github.com/robbert-vdh/nih-plug.git" }
+
+# DeepFilterNet - df という名前でエクスポート
+# 「default-mode」を「default-model-ll」ならば、低遅延版。
+df = { git = "https://github.com/Rikorose/DeepFilterNet.git", tag = "v0.5.6", package = "deep_filter", features = ["tract", "default-model", "transforms"] }
+
+# ndarray は df が使用するバージョンに合わせる
+ndarray = "0.15"
+log = "0.4"
