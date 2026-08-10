@@ -1,6 +1,6 @@
 # ビルド成果物
 /target/
-
+build/
 # macOS
 .DS_Store
 *.swp
