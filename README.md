@@ -1,6 +1,34 @@
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:center"><a href="README_ja.md">日本語</a></th>
+      <th style="text-align:center"><a href="README.md">English</a></th>
+    </tr>
+  </thead>
+</table>
+
 # DeepFilterNet3 VST3
 
 DeepFilterNet3 VST3 is a macOS audio plugin that embeds the official DeepFilterNet v0.5.6 model for real-time and offline noise reduction. It exports VST3 and CLAP bundles through nice-plug, accepts mono or stereo tracks, and keeps neural inference and sample-rate conversion on a persistent worker so the host audio callback remains nonblocking.
+
+## Contents
+
+- [Features](#features)
+- [Tech stack](#tech-stack)
+- [Current validation scope](#current-validation-scope)
+- [Audio behavior](#audio-behavior)
+- [Latency](#latency)
+- [Requirements](#requirements)
+- [Build and model selection](#build-and-model-selection)
+- [Install](#install)
+- [Usage](#usage)
+- [Parameters](#parameters)
+- [Development and testing](#development-and-testing)
+- [Project structure](#project-structure)
+- [Troubleshooting](#troubleshooting)
+- [Known limitations](#known-limitations)
+- [License](#license)
+- [Credits](#credits)
 
 ## Features
 
@@ -12,6 +40,16 @@ DeepFilterNet3 VST3 is a macOS audio plugin that embeds the official DeepFilterN
 - The same DSP, resamplers, timeline, and reset protocol in Realtime, Buffered, and Offline modes.
 - Lock-free callback transport and a latency-aligned dry fallback when a worker result is late.
 - VST3 and CLAP exports with stable plugin and parameter IDs.
+
+## Tech stack
+
+| Component | Role |
+| :--- | :--- |
+| Rust 2021 workspace | Plugin, DSP bridge, tests, and bundle task |
+| [nice-plug 0.2.3](https://codeberg.org/RustAudio/nice-plug) | VST3/CLAP framework and exports |
+| [DeepFilterNet 0.5.6](https://github.com/Rikorose/DeepFilterNet/tree/v0.5.6) | Official embedded model and Tract inference |
+| [rubato 0.14.1](https://github.com/HEnquist/rubato/tree/v0.14.1) | Persistent fixed-size sample-rate conversion |
+| [rtrb 0.3.3](https://github.com/mgeier/rtrb/tree/v0.3.3) | Lock-free worker queues |
 
 ## Current validation scope
 
@@ -52,7 +90,7 @@ Mix values of 0%, 50%, and 100% remain peak-aligned at the reported latency. The
 
 The build downloads Rust dependencies and the pinned official DeepFilterNet v0.5.6 source/model archive.
 
-## Build
+## Build and model selection
 
 Clone the repository and build the default low-latency model:
 
@@ -95,6 +133,15 @@ cp -R target/bundled/deepfilter-vst.clap "$HOME/Library/Audio/Plug-Ins/CLAP/"
 
 Restart or rescan the host after installation. Local builds are not distributed with a Developer ID signature or Apple notarization.
 
+## Usage
+
+1. Build and install the VST3 or CLAP bundle, then restart or rescan the host.
+2. Add **DeepFilter Noise Reduction** to a mono or stereo audio track.
+3. Leave **Mix** at 100% for the fully enhanced signal, or reduce it to blend in the latency-aligned dry channel.
+4. Adjust **Attenuation Limit** to cap the amount of noise attenuation. A 0 dB setting selects aligned raw audio while keeping model state advancing.
+
+The host receives the plugin's calculated latency during initialization. If the requested host configuration is unsupported, the plugin remains available but passes audio through unchanged and reports zero latency.
+
 ## Parameters
 
 | Parameter | Range | Default | Behavior |
@@ -102,7 +149,7 @@ Restart or rescan the host after installation. Local builds are not distributed 
 | Attenuation Limit | 0–100 dB | 100 dB | Limits the attenuation applied by DeepFilterNet. At effectively 0 dB, the model still advances while the aligned raw path is selected. |
 | Mix | 0–100% | 100% | Blends latency-aligned per-channel dry audio with the mono wet result. |
 
-## Development validation
+## Development and testing
 
 Build a debug bundle with nice-plug's callback allocation assertions:
 
@@ -121,6 +168,34 @@ cargo test -p deepfilter-vst --lib && \
 ```
 
 The VST3 bundle used for pluginval should be the allocation-asserting debug artifact from the preceding command.
+
+## Project structure
+
+```text
+plugin/src/lib.rs        Plugin metadata, lifecycle, host layouts, and exports
+plugin/src/params.rs     Attenuation Limit and Mix parameters
+plugin/src/bridge.rs     Callback-side buffering, alignment, and fallback
+plugin/src/dsp.rs        Worker DSP core and latency calculation
+plugin/src/model.rs      DeepFilterNet model wrapper and metadata
+plugin/src/resampler.rs  Checked persistent sample-rate conversion
+plugin/src/worker.rs     Worker lifecycle, queues, reset, and status
+xtask/                   VST3/CLAP bundle command
+```
+
+`PLANS.md` records the implementation and validation evidence. `CHANGELOG.md`,
+`NOTES.md`, and `THIRD_PARTY_NOTICES.md` provide release changes, maintainer
+notes, and dependency/model attribution.
+
+## Troubleshooting
+
+If a host keeps discovering an older local build, clean and recreate the release bundle before reinstalling it:
+
+```bash
+cargo clean
+cargo xtask bundle deepfilter-vst --release
+```
+
+Confirm that the VST3 or CLAP directory matches the installation paths above, then restart or rescan the host. A locally built bundle is not Developer ID signed or notarized, so macOS host security behavior may differ from a distributed signed plugin.
 
 ## Known limitations
 

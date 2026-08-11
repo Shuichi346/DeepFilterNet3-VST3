@@ -1,0 +1,215 @@
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:center"><a href="README_ja.md">日本語</a></th>
+      <th style="text-align:center"><a href="README.md">English</a></th>
+    </tr>
+  </thead>
+</table>
+
+# DeepFilterNet3 VST3
+
+DeepFilterNet3 VST3 は、リアルタイムおよびオフラインのノイズリダクションのために公式 DeepFilterNet v0.5.6 モデルを組み込んだ macOS 向けオーディオプラグインです。nice-plug を通じて VST3 および CLAP バンドルをエクスポートし、モノラルまたはステレオトラックに対応します。また、ニューラル推論とサンプルレート変換を常駐ワーカー上で実行することで、ホストのオーディオコールバックをノンブロッキングに保ちます。
+
+## 目次
+
+- [機能](#機能)
+- [技術スタック](#技術スタック)
+- [現在の検証範囲](#現在の検証範囲)
+- [オーディオの動作](#オーディオの動作)
+- [レイテンシ](#レイテンシ)
+- [要件](#要件)
+- [ビルドとモデルの選択](#ビルドとモデルの選択)
+- [インストール](#インストール)
+- [使用方法](#使用方法)
+- [パラメータ](#パラメータ)
+- [開発とテスト](#開発とテスト)
+- [プロジェクト構造](#プロジェクト構造)
+- [トラブルシューティング](#トラブルシューティング)
+- [既知の制限事項](#既知の制限事項)
+- [ライセンス](#ライセンス)
+- [クレジット](#クレジット)
+
+## 機能
+
+- デフォルトで公式 DeepFilterNet3 低レイテンシモデルを使用。公式標準モデルは別途ビルド時オプションとして選択可能。
+- 1 つのモノラル推論ストリームによるモノラル・ステレオ入出力レイアウトに対応。
+- 固定タイムスタンプ付きワーカーチャンクによる任意のホストブロックサイズに対応。
+- 44.1、48、88.2、96、176.4、192 kHz のホストレートに対応したストリーミング変換。
+- サンプル整合されたドライ/ウェットミキシングによるレイテンシ報告。
+- リアルタイム、バッファード、オフラインモードで同一の DSP・リサンプラー・タイムライン・リセットプロトコルを使用。
+- ロックフリーなコールバックトランスポートと、ワーカー結果が遅延した場合のレイテンシ整合されたドライフォールバック。
+- 安定したプラグインおよびパラメータ ID を持つ VST3 および CLAP エクスポート。
+
+## 技術スタック
+
+| コンポーネント | 役割 |
+| :--- | :--- |
+| Rust 2021 ワークスペース | プラグイン、DSP ブリッジ、テスト、バンドルタスク |
+| [nice-plug 0.2.3](https://codeberg.org/RustAudio/nice-plug) | VST3/CLAP フレームワークおよびエクスポート |
+| [DeepFilterNet 0.5.6](https://github.com/Rikorose/DeepFilterNet/tree/v0.5.6) | 公式組み込みモデルおよび Tract 推論 |
+| [rubato 0.14.1](https://github.com/HEnquist/rubato/tree/v0.14.1) | 固定サイズの常駐サンプルレート変換 |
+| [rtrb 0.3.3](https://github.com/mgeier/rtrb/tree/v0.3.3) | ロックフリーなワーカーキュー |
+
+## 現在の検証範囲
+
+現在の実装は Apple Silicon 搭載 Mac の macOS 26 上でビルドおよびテスト済みです。自動検証には 24 件の Rust テストと、コールバックアロケーションアサーション付きの pluginval 厳密度レベル 5 が含まれます。pluginval では 44.1、48、96 kHz の処理とオートメーションを実行し、`SUCCESS` で完了しました。
+
+DaVinci Resolve 20 が対象ホストですが、最終的なインタラクティブ再生および Deliver のスモークテストはまだ完了していません。Windows、Linux、Intel macOS のビルドは検証されていません。
+
+## オーディオの動作
+
+組み込みモデルは常に 1 チャンネルを受け取ります。
+
+- モノラル入力はそのまま推論に渡されます。
+- ステレオ入力は `(左 + 右) / 2` としてダウンミックスされ推論に渡されます。
+- モノラルのウェット結果は両方のステレオ出力にコピーされます。
+- 各ステレオチャンネルは、整合されたドライ/ウェットミックスの前に独自のドライ信号を保持します。
+
+プラグインはドライおよびウェット出力の両方を報告されたレイテンシ分だけ遅延させます。起動中またはリアルタイムワーカーのアンダーランが発生した場合、影響を受けるサンプルは無音や古いウェットフレームの代わりに、同じ遅延タイムスタンプのドライオーディオを使用します。オフラインモードでも同じワーカーパイプラインを使用し、必要なタイムスタンプ付き結果を最大 2 秒間待機することがあります。
+
+サポートされていないサンプルレートまたはホストバッファのジオメトリ、モデル起動失敗、その他の初期化失敗が発生した場合は、報告されたレイテンシがゼロの直接バイパスが選択されます。
+
+## レイテンシ
+
+レイテンシはライブモデルメタデータ、両リサンプラー、およびノンブロッキングな収集と推論のために予約された 2 つのホスト量子から計算されます。公式低レイテンシモデルは、48 kHz の FFT サイズ 960、ホップサイズ 480、ゼルーカヘッド、480 サンプルの固有モデル遅延を報告します。
+
+| ホストレート | ホスト量子 | 報告されたレイテンシ | インパルス検証 |
+| ---: | ---: | ---: | :--- |
+| 44.1 kHz | 441 サンプル | 1,764 サンプル（40 ms） | 1 サンプル以内 |
+| 48 kHz | 480 サンプル | 1,440 サンプル（30 ms） | 完全一致 |
+| 96 kHz | 960 サンプル | 3,840 サンプル（40 ms） | 1 サンプル以内 |
+
+0%、50%、100% のミックス値は、報告されたレイテンシでピーク整合を維持します。他の宣言されたレートは同じ検証済み計算式とストリーミングコンバータのジオメトリを使用します。
+
+## 要件
+
+- 検証済み構成として macOS 26.x 以降を搭載した Apple Silicon Mac。
+- nice-plug 0.2.3 をビルドするために Rust 1.87 以降。
+- VST3 または CLAP 対応ホスト。
+
+ビルド時に Rust の依存関係と固定された公式 DeepFilterNet v0.5.6 のソース/モデルアーカイブがダウンロードされます。
+
+## ビルドとモデルの選択
+
+リポジトリをクローンし、デフォルトの低レイテンシモデルをビルドします：
+
+```bash
+git clone https://github.com/Shuichi346/DeepFilterNet3-VST3.git
+cd DeepFilterNet3-VST3
+cargo xtask bundle deepfilter-vst --release
+```
+
+生成されるバンドル：
+
+```text
+target/bundled/deepfilter-vst.vst3
+target/bundled/deepfilter-vst.clap
+```
+
+デフォルトの低レイテンシモデルの代わりに公式標準モデルをビルドする場合：
+
+```bash
+cargo xtask bundle deepfilter-vst --release --no-default-features --features model-standard
+```
+
+モデルのフィーチャーは互いに排他的です。`model-ll` または `model-standard` のいずれか 1 つだけを有効にする必要があります。
+
+## インストール
+
+macOS でのユーザー専用 VST3 インストール：
+
+```bash
+mkdir -p "$HOME/Library/Audio/Plug-Ins/VST3"
+cp -R target/bundled/deepfilter-vst.vst3 "$HOME/Library/Audio/Plug-Ins/VST3/"
+```
+
+CLAP ホストの場合：
+
+```bash
+mkdir -p "$HOME/Library/Audio/Plug-Ins/CLAP"
+cp -R target/bundled/deepfilter-vst.clap "$HOME/Library/Audio/Plug-Ins/CLAP/"
+```
+
+インストール後はホストを再起動またはプラグインを再スキャンしてください。ローカルビルドには Developer ID 署名および Apple 公証は付与されていません。
+
+## 使用方法
+
+1. VST3 または CLAP バンドルをビルドしてインストールし、ホストを再起動または再スキャンします。
+2. モノラルまたはステレオのオーディオトラックに **DeepFilter Noise Reduction** を追加します。
+3. 完全に強調された信号を使用する場合は **Mix** を 100% のままにします。レイテンシ整合されたドライチャンネルをブレンドする場合は値を下げます。
+4. **Attenuation Limit** を調整して、ノイズの減衰量を制限します。0 dB 設定ではモデルの状態を進めながら整合された生オーディオが選択されます。
+
+ホストは初期化時にプラグインの計算済みレイテンシを受け取ります。要求されたホスト構成がサポートされていない場合、プラグインは利用可能な状態を保ちながらオーディオをそのまま通過させ、ゼロレイテンシを報告します。
+
+## パラメータ
+
+| パラメータ | 範囲 | デフォルト | 動作 |
+| :--- | ---: | ---: | :--- |
+| Attenuation Limit | 0〜100 dB | 100 dB | DeepFilterNet が適用する減衰量を制限します。実質的に 0 dB の場合、モデルは引き続き処理を進めながら整合された生のパスが選択されます。 |
+| Mix | 0〜100% | 100% | レイテンシ整合されたチャンネルごとのドライオーディオとモノラルのウェット結果をブレンドします。 |
+
+## 開発とテスト
+
+nice-plug のコールバックアロケーションアサーションを有効にしてデバッグバンドルをビルドします：
+
+```bash
+cargo xtask bundle deepfilter-vst --features nice-plug/assert_process_allocs
+```
+
+バインドされたライブラリおよびプラグインの検証ゲートを実行します：
+
+```bash
+cargo test -p deepfilter-vst --lib && \
+/Applications/pluginval.app/Contents/MacOS/pluginval \
+  --strictness-level 5 \
+  --validate-in-process \
+  target/bundled/deepfilter-vst.vst3
+```
+
+pluginval に使用する VST3 バンドルは、上記コマンドで生成されたアロケーションアサーション付きのデバッグ成果物である必要があります。
+
+## プロジェクト構造
+
+```text
+plugin/src/lib.rs        プラグインのメタデータ、ライフサイクル、ホストレイアウト、エクスポート
+plugin/src/params.rs     Attenuation Limit および Mix パラメータ
+plugin/src/bridge.rs     コールバック側のバッファリング、整合、フォールバック
+plugin/src/dsp.rs        ワーカー DSP コアおよびレイテンシ計算
+plugin/src/model.rs      DeepFilterNet モデルラッパーおよびメタデータ
+plugin/src/resampler.rs  検証済みの常駐サンプルレート変換
+plugin/src/worker.rs     ワーカーのライフサイクル、キュー、リセット、ステータス
+xtask/                   VST3/CLAP バンドルコマンド
+```
+
+`PLANS.md` には実装と検証の証拠が記録されています。`CHANGELOG.md`、`NOTES.md`、`THIRD_PARTY_NOTICES.md` はリリース変更点、メンテナーノート、依存関係/モデルの帰属情報を提供します。
+
+## トラブルシューティング
+
+ホストが古いローカルビルドを検出し続ける場合は、再インストールする前にクリーンしてリリースバンドルを再作成してください：
+
+```bash
+cargo clean
+cargo xtask bundle deepfilter-vst --release
+```
+
+VST3 または CLAP ディレクトリが上記のインストールパスと一致していることを確認し、ホストを再起動または再スキャンしてください。ローカルビルドのバンドルには Developer ID 署名および公証が付与されていないため、macOS のホストセキュリティの動作が配布済みの署名付きプラグインと異なる場合があります。
+
+## 既知の制限事項
+
+- ウェットパスは設計上モノラルです。ステレオの空間的な差異はドライの寄与にのみ残ります。
+- リアルタイムスケジューリングの遅延により、強調された出力が得られない場合に一時的に整合されたドライオーディオが代替として使用されることがあります。
+- ワーカー/モデルの起動は最大 10 秒に制限されており、起動失敗の場合は直接バイパスが選択されます。
+- サポートされていないレートまたはバッファ構成の場合、近似的なリサンプリングではなく直接バイパスが選択されます。
+- DaVinci Resolve の再生および Deliver の動作については、最終的な手動スモークチェックがまだ必要です。
+- 上記で説明した Apple Silicon macOS 構成のみが検証されています。
+
+## ライセンス
+
+DeepFilterNet3-VST3 は [MIT License](LICENSE-MIT) または [Apache License 2.0](LICENSE-APACHE) のいずれかのライセンスの下で利用可能です（お好みで選択してください）。バンドルされたモデル、ライブラリ、および VST 3 の帰属については [Third-Party Notices](THIRD_PARTY_NOTICES.md) を参照してください。
+
+## クレジット
+
+- [DeepFilterNet](https://github.com/Rikorose/DeepFilterNet) — Hendrik Schröter およびコントリビューター。
+- [nice-plug](https://codeberg.org/RustAudio/nice-plug) — RustAudio コントリビューター。
+- [rubato](https://github.com/HEnquist/rubato) — ストリーミングサンプルレート変換。
