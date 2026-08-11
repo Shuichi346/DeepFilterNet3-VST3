@@ -22,6 +22,7 @@
 
 ### Changed
 
+- Changed the project and plug-in release version to 0.5.0.
 - Migrated the VST3/CLAP plugin and bundler from nih-plug to released
   nice-plug packages while preserving plugin, parameter, CLAP, and VST3
   identities.

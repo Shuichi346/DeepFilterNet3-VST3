@@ -2,6 +2,11 @@
 
 ## 2026-08-11
 
+- The project and plug-in release version was changed from 0.1.0 to 0.5.0;
+  the private `xtask` helper retained its independent 0.1.0 package version.
+- `scripts/package-release.sh` produced the verified 0.5.0 Apple Silicon
+  package at `dist/DeepFilterNR-v0.5.0-macos-arm64.zip`; its SHA-256 is
+  `33064872612cd13ae39f08b406096696dee24b22a7d2673da8b2ab5d430c1104`.
 - All 24 Rust library tests passed, including real-model reset and latency
   checks. Measured latency was 1764 samples at 44.1 kHz, 1440 at 48 kHz, and
   3840 at 96 kHz.
@@ -13,7 +18,7 @@
   under `target/bundled/`.
 - The final release build emitted only private-visibility and unused-helper
   warnings. No build error remained.
-- `scripts/package-release.sh` produced the 80 MB Apple Silicon candidate at
+- The earlier packaging run produced the superseded 0.1.0 candidate at
   `dist/DeepFilterNR-v0.1.0-macos-arm64.zip`; its accepted SHA-256 is
   `5a84c441835bbeefa69c20a301e9c07b3e99a5fc5821b3fa1d35fadb12a36ce8`.
 - The first package inventory exposed unwanted `._*` AppleDouble entries.
