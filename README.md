@@ -11,9 +11,22 @@
 
 DeepFilterNet3 VST3 is a macOS audio plugin that embeds the official DeepFilterNet v0.5.6 model for real-time and offline noise reduction. It exports VST3 and CLAP bundles through nice-plug, accepts mono or stereo tracks, and keeps neural inference and sample-rate conversion on a persistent worker so the host audio callback remains nonblocking.
 
+## Preview
+
+<img src="githubreadme/screensho.png" alt="DeepFilter Noise Reduction plugin window with Attenuation Limit and Mix controls" width="480">
+
+## Audio demo
+
+The plug-in bypassed and enabled:
+
+- [Effect off — original signal (WAV)](githubreadme/effect-off.wav)
+- [Effect on — DeepFilter Noise Reduction enabled (WAV)](githubreadme/effect-on.wav)
+
 ## Contents
 
 - [Features](#features)
+- [Preview](#preview)
+- [Audio demo](#audio-demo)
 - [Tech stack](#tech-stack)
 - [Current validation scope](#current-validation-scope)
 - [Audio behavior](#audio-behavior)
@@ -169,6 +182,28 @@ cargo test -p deepfilter-vst --lib && \
 
 The VST3 bundle used for pluginval should be the allocation-asserting debug artifact from the preceding command.
 
+Create the Apple Silicon release package after building the release bundles:
+
+```bash
+cargo xtask bundle deepfilter-vst --release
+./scripts/package-release.sh
+```
+
+The script reads the version from `plugin/Cargo.toml`. You can also pass an explicit version:
+
+```bash
+./scripts/package-release.sh 0.1.0
+```
+
+It verifies that both bundles are thin arm64 binaries with valid ad-hoc signatures, then creates:
+
+```text
+dist/DeepFilterNR-v0.1.0-macos-arm64.zip
+dist/DeepFilterNR-v0.1.0-macos-arm64.zip.sha256
+```
+
+The ZIP contains the VST3 and CLAP bundles, a concise English installation and usage README, the project MIT license, third-party notices and license material, and binary SHA-256 checksums. Existing packages are never overwritten. The script does not install or publish anything. 
+
 ## Project structure
 
 ```text
@@ -180,6 +215,7 @@ plugin/src/model.rs      DeepFilterNet model wrapper and metadata
 plugin/src/resampler.rs  Checked persistent sample-rate conversion
 plugin/src/worker.rs     Worker lifecycle, queues, reset, and status
 xtask/                   VST3/CLAP bundle command
+scripts/                 Release packaging tools
 ```
 
 `PLANS.md` records the implementation and validation evidence. `CHANGELOG.md`,
@@ -208,7 +244,7 @@ Confirm that the VST3 or CLAP directory matches the installation paths above, th
 
 ## License
 
-DeepFilterNet3-VST3 is [MIT License](LICENSE-MIT).
+DeepFilterNet3-VST3 is licensed under the [MIT License](LICENSE).
 See [Third-Party Notices](THIRD_PARTY_NOTICES.md) for bundled models, libraries, and VST 3 attribution.
 
 ## Credits

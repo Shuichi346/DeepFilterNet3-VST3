@@ -32,3 +32,18 @@ Project instructions for coding agents working in this repository.
 - Supported enhanced rates are 44.1, 48, 88.2, 96, 176.4, and 192 kHz.
   Unsupported rates, invalid layouts, queue limits, or startup failures must
   initialize as unchanged direct bypass with zero reported latency.
+
+## Release packaging
+
+- Keep the project license as MIT in `plugin/Cargo.toml` and root `LICENSE`.
+  Treat files under `third-party-licenses/` and `THIRD_PARTY_NOTICES.md` as
+  third-party terms, not alternative project licenses.
+- After a successful release bundle build, create the Apple Silicon archive
+  only with `./scripts/package-release.sh`. The script must keep verifying thin
+  arm64 binaries, valid ad-hoc signatures, ZIP integrity, and SHA-256 output;
+  do not weaken its non-overwrite behavior or remove `ditto --norsrc`.
+- Keep `githubreadme/screensho.png`, `githubreadme/effect-off.wav`, and
+  `githubreadme/effect-on.wav` as repository README assets. Do not include
+  image or audio assets in the release ZIP.
+- Keep generated `dist/` artifacts untracked. Attach both the ZIP and its
+  `.zip.sha256` sidecar when a release is eventually published.

@@ -1,5 +1,6 @@
 # ビルド成果物
 /target/
+/dist/
 build/
 # macOS
 .DS_Store

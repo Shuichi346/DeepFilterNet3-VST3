@@ -12,14 +12,21 @@
   unchanged zero-latency bypass.
 - Added explicit `model-ll` and `model-standard` build features. The official
   DeepFilterNet v0.5.6 low-latency model is the default.
-- Added project MIT/Apache-2.0 license texts and locked-dependency/model
-  notices.
+- Added `scripts/package-release.sh` to create a verified, non-overwriting
+  Apple Silicon ZIP containing both plug-in formats, an English user README,
+  licenses, notices, and SHA-256 checksums.
+- Added a plug-in screenshot and matching effect-off/effect-on WAV demos to
+  the repository README. These media assets are excluded from release ZIPs.
+- Added locked-dependency and embedded-model notices, including the unresolved
+  upstream pretrained-model redistribution clarification.
 
 ### Changed
 
 - Migrated the VST3/CLAP plugin and bundler from nih-plug to released
   nice-plug packages while preserving plugin, parameter, CLAP, and VST3
   identities.
+- Changed the project license from `MIT OR Apache-2.0` to MIT. Apache-2.0 text
+  is retained only as clearly separated third-party license material.
 - Moved model inference and persistent sample-rate conversion off the audio
   callback and aligned missing or degraded wet output with the delayed dry
   timeline instead of emitting stale or silent audio.

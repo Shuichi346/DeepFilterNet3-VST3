@@ -5,6 +5,11 @@ build DeepFilterNet3-VST3. The exact resolved Rust package versions are recorded
 in `Cargo.lock`. License links below point to the corresponding upstream
 projects; this notice does not replace their license texts or terms.
 
+The DeepFilterNet3-VST3 project code is licensed under MIT. The licenses listed
+below apply independently to their respective third-party components.
+The canonical Apache-2.0 text retained for applicable third-party components is
+available at `third-party-licenses/Apache-2.0.txt`.
+
 ## Runtime and bundled components
 
 ### DeepFilterNet / `deep_filter` 0.5.6
