@@ -206,7 +206,8 @@ VST3 または CLAP ディレクトリが上記のインストールパスと一
 
 ## ライセンス
 
-DeepFilterNet3-VST3 は [MIT License](LICENSE-MIT) または [Apache License 2.0](LICENSE-APACHE) のいずれかのライセンスの下で利用可能です（お好みで選択してください）。バンドルされたモデル、ライブラリ、および VST 3 の帰属については [Third-Party Notices](THIRD_PARTY_NOTICES.md) を参照してください。
+DeepFilterNet3-VST3 は [MIT ライセンス](LICENSE-MIT) です。
+バンドルされているモデル、ライブラリ、および VST 3 の帰属表示については、[サードパーティに関する通知](THIRD_PARTY_NOTICES.md) をご覧ください。
 
 ## クレジット
 
