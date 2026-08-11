@@ -202,7 +202,9 @@ dist/DeepFilterNR-v0.5.0-macos-arm64.zip
 dist/DeepFilterNR-v0.5.0-macos-arm64.zip.sha256
 ```
 
-The ZIP contains the VST3 and CLAP bundles, a concise English installation and usage README, the project MIT license, third-party notices and license material, and binary SHA-256 checksums. Existing packages are never overwritten. The script does not install or publish anything. 
+The ZIP contains both plug-in bundles, installation instructions, required
+license notices, and checksums. Existing packages are never overwritten. The
+script does not install or publish anything.
 
 ## Project structure
 
@@ -218,9 +220,8 @@ xtask/                   VST3/CLAP bundle command
 scripts/                 Release packaging tools
 ```
 
-`PLANS.md` records the implementation and validation evidence. `CHANGELOG.md`,
-`NOTES.md`, and `THIRD_PARTY_NOTICES.md` provide release changes, maintainer
-notes, and dependency/model attribution.
+`PLANS.md` records the implementation and validation evidence. `CHANGELOG.md`
+and `NOTES.md` record release and maintenance information.
 
 ## Troubleshooting
 
@@ -244,8 +245,8 @@ Confirm that the VST3 or CLAP directory matches the installation paths above, th
 
 ## License
 
-DeepFilterNet3-VST3 is licensed under the [MIT License](LICENSE).
-See [Third-Party Notices](THIRD_PARTY_NOTICES.md) for bundled models, libraries, and VST 3 attribution.
+[MIT License](LICENSE). Required notices for redistributed components are in
+[Third-Party Notices](THIRD_PARTY_NOTICES.md).
 
 ## Credits
 

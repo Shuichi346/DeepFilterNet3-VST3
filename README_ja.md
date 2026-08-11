@@ -182,7 +182,7 @@ plugin/src/worker.rs     ワーカーのライフサイクル、キュー、リ�
 xtask/                   VST3/CLAP バンドルコマンド
 ```
 
-`PLANS.md` には実装と検証の証拠が記録されています。`CHANGELOG.md`、`NOTES.md`、`THIRD_PARTY_NOTICES.md` はリリース変更点、メンテナーノート、依存関係/モデルの帰属情報を提供します。
+`PLANS.md` には実装と検証の証拠が記録されています。`CHANGELOG.md` と `NOTES.md` にはリリースおよびメンテナンス情報が記録されています。
 
 ## トラブルシューティング
 
@@ -206,8 +206,7 @@ VST3 または CLAP ディレクトリが上記のインストールパスと一
 
 ## ライセンス
 
-DeepFilterNet3-VST3 は [MIT ライセンス](LICENSE-MIT) です。
-バンドルされているモデル、ライブラリ、および VST 3 の帰属表示については、[サードパーティに関する通知](THIRD_PARTY_NOTICES.md) をご覧ください。
+[MIT ライセンス](LICENSE)。再配布に必要な通知は [サードパーティ通知](THIRD_PARTY_NOTICES.md) にまとめています。
 
 ## クレジット
 

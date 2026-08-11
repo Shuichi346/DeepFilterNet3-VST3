@@ -85,6 +85,7 @@ require_bundle "${SOURCE_VST3}"
 require_bundle "${SOURCE_CLAP}"
 require_file "${REPO_ROOT}/LICENSE"
 require_file "${REPO_ROOT}/third-party-licenses/Apache-2.0.txt"
+require_file "${REPO_ROOT}/third-party-licenses/Unicode-3.0.txt"
 require_file "${REPO_ROOT}/THIRD_PARTY_NOTICES.md"
 
 validate_bundle "${SOURCE_VST3}"
@@ -120,6 +121,8 @@ trap cleanup EXIT HUP INT TERM
 /usr/bin/ditto "${REPO_ROOT}/LICENSE" "${payload_dir}/LICENSE"
 /usr/bin/ditto "${REPO_ROOT}/third-party-licenses/Apache-2.0.txt" \
     "${payload_dir}/Third-Party-Licenses/Apache-2.0.txt"
+/usr/bin/ditto "${REPO_ROOT}/third-party-licenses/Unicode-3.0.txt" \
+    "${payload_dir}/Third-Party-Licenses/Unicode-3.0.txt"
 /usr/bin/ditto "${REPO_ROOT}/THIRD_PARTY_NOTICES.md" \
     "${payload_dir}/THIRD_PARTY_NOTICES.md"
 
@@ -190,7 +193,7 @@ No `sudo` command is needed for a user-only installation.
 Supported enhanced sample rates are 44.1, 48, 88.2, 96, 176.4, and 192 kHz.
 Unsupported host configurations use unchanged direct bypass instead of silence.
 
-## Integrity and licenses
+## Integrity
 
 The GitHub Release should provide a `.zip.sha256` sidecar. Verify it before
 installation:
@@ -199,13 +202,12 @@ installation:
 shasum -a 256 -c DeepFilterNR-v*-macos-arm64.zip.sha256
 ```
 
-The project code is licensed under MIT; see `LICENSE`. Third-party components
-retain their own terms; see `THIRD_PARTY_NOTICES.md` and
-`Third-Party-Licenses/`.
+## Licenses
 
-The embedded low-latency model comes from DeepFilterNet v0.5.6. At package
-creation time, its repository dual-licenses its code but provides no separate
-license file for the pretrained model archive.
+See `LICENSE`, `THIRD_PARTY_NOTICES.md`, and `Third-Party-Licenses/`.
+
+The embedded DeepFilterNet v0.5.6 model archive has no separate model-weight
+license. Do not publicly redistribute it without confirming permission.
 
 VST is a registered trademark of Steinberg Media Technologies GmbH.
 README_EOF

@@ -10,18 +10,18 @@ The real-time audio callback will not run `DfTract` directly because v0.5.6's Tr
 
 ## Resume Here
 
-- Updated: 2026-08-11 12:44Z
-- Overall status: PAUSED — local release package prepared; publication deferred
-- Active phase: Release preparation complete
+- Updated: 2026-08-11 13:43Z
+- Overall status: PAUSED — simplified release package prepared; publication deferred
+- Active phase: License notice simplification complete
 - Active step: None
 - Last verified checkpoint: Release Packaging PASS on Step 5.G execution 2/2; Final Acceptance PASS on attempt 2/3.
-- Completed since previous checkpoint: Created the current MIT Apple Silicon package and SHA-256 sidecar. The accepted ZIP contains VST3, CLAP, an English installation/security/usage README, project MIT license, third-party notices and separated Apache-2.0 text, release metadata, and binary checksums. Repository screenshot/audio assets are excluded.
+- Completed since previous checkpoint: Removed optional license explanations from both repository READMEs, third-party notices, and the package README; retained the project MIT license, applicable third-party terms, the unresolved embedded-model warning, and the required VST attribution. Regenerated the v0.5.0 ZIP from unchanged accepted binaries.
 - In progress: None. No release upload, plug-in installation, or host mutation was performed.
-- Next action: After upstream confirms pretrained-model redistribution terms, the user may attach the ZIP and `.sha256` sidecar to a GitHub Release. The deferred manual Resolve flow remains separately available.
+- Next action: After upstream confirms pretrained-model redistribution terms, the user may attach the v0.5.0 ZIP and `.sha256` sidecar to a GitHub Release. The deferred manual Resolve flow remains separately available.
 - Blockers / decisions needed: Manual SC-11 evidence remains deferred. Upstream DeepFilterNet issue #697 still leaves pretrained-model redistribution terms unconfirmed, so the package may be prepared locally but must not be described as legally cleared or uploaded by Codex.
 - Final verification: PASS — attempt 2/3; exact `cargo xtask bundle deepfilter-vst --release` exited 0 at 2026-08-11 12:41Z and recreated both release bundles after the MIT manifest change. Eight previously recorded non-fatal warnings remain.
-- Working tree state: `/Users/shuichi/Documents/GitHub/DeepFilterNet3-VST3`; branch `updatenow`; HEAD `e839c91d8eae4ac46091cd332658621ddbd4609b`; modified: `.gitignore`, `PLANS.md`, `README.md`, `THIRD_PARTY_NOTICES.md`, `plugin/Cargo.toml`; renamed: `LICENSE-MIT` to `LICENSE`, `LICENSE-APACHE` to `third-party-licenses/Apache-2.0.txt`; untracked: `githubreadme/` and `scripts/`. Generated `dist/` is intentionally ignored.
-- Evidence: Final attempt 2 completed in 1.77 seconds and recreated both bundles. Step 5.G execution 2/2 exited 0 in 2.42 seconds after adding `ditto --norsrc`; ZIP integrity and SHA-256 verification passed, and inventory inspection found no AppleDouble, PNG, or WAV entries. Accepted archive SHA-256: `5a84c441835bbeefa69c20a301e9c07b3e99a5fc5821b3fa1d35fadb12a36ce8`.
+- Working tree state: `/Users/shuichi/Documents/GitHub/DeepFilterNet3-VST3`; branch `updatenow`; HEAD `e839c91d8eae4ac46091cd332658621ddbd4609b`; modified: `PLANS.md`, `README.md`, `README_ja.md`, `THIRD_PARTY_NOTICES.md`, `scripts/package-release.sh`, `third-party-licenses/Apache-2.0.txt`; untracked: `third-party-licenses/Unicode-3.0.txt`. Generated `dist/` artifacts remain ignored.
+- Evidence: Step 6.G execution 2/2 created `dist/DeepFilterNR-v0.5.0-macos-arm64.zip`; ZIP integrity and sidecar verification passed, required license files were present, no AppleDouble/PNG/WAV entries were present, and both VST3/CLAP binary hashes remained `6b9e074022a3db8cd5ffcf01d1b2fc49943d51e7a3735195d42b6a8b6c4d8e56`. Accepted ZIP SHA-256: `b50c4e97073743cc91c905a04e9c349de4bd96fc181f8f3d3dcae34d4fb43204`.
 
 ## Execution Contract
 
@@ -485,6 +485,21 @@ Only the coordinating main agent writes this plan. Write-based implementation re
 - **Verification:** `./scripts/package-release.sh`; expected exit 0; timeout 2 minutes; maximum 2 executions. Follow with read-only archive inventory inspection; no upload or installation.
 - **Status:** COMPLETE — 2026-08-11 12:44Z; execution 2/2 passed after the `--norsrc` repair, with ZIP integrity, sidecar SHA-256, and clean inventory evidence.
 
+### Phase 6 — License notice simplification
+
+#### Step 6.1 — Remove optional license explanation while preserving required terms
+
+- **Location:** `README.md`, `README_ja.md`, `THIRD_PARTY_NOTICES.md`, `third-party-licenses/Apache-2.0.txt`, `scripts/package-release.sh`
+- **Action:** Remove dependency-purpose prose, license-family commentary, redundant trademark prose, and repeated package-README explanations. Keep the project MIT license, license texts/notices required for redistributed third-party code, and a short warning that the embedded model archive has no separately stated upstream redistribution license.
+- **Verification:** Compare retained notices against locked package metadata and upstream license files; run `zsh -n scripts/package-release.sh` and `git diff --check`; do not rebuild or retest unchanged Rust binaries.
+- **Status:** COMPLETE — 2026-08-11 13:39Z; removed dependency-purpose prose and the transitive license-expression table, reduced both README license sections, corrected the Apache reference to the canonical placeholder, added the required Unicode v3 notice, and retained only applicable MIT/ISC/Apache/Unicode notices plus the model warning and exact VST attribution. Locked metadata/upstream file comparison, `zsh -n`, and `git diff --check` passed.
+
+#### Step 6.G — Regenerate and inspect the documentation-only release package
+
+- **Action:** Preserve the prior generated package as a recoverable backup, rerun the non-overwriting package script against the already accepted unchanged bundles, and inspect ZIP integrity, sidecar SHA-256, inventory, and included license material. Do not upload or install.
+- **Verification:** `./scripts/package-release.sh`; expected exit 0; timeout 2 minutes; maximum 2 executions under this user-authorized documentation revision. Follow with read-only archive inspection.
+- **Status:** COMPLETE — 2026-08-11 13:43Z; execution 1/2 exposed one package-only `Cargo.lock` reference and combined ISC wording, which were simplified/corrected. Execution 2/2 passed architecture/signature checks, ZIP integrity, sidecar verification, inventory inspection, and unchanged-binary hash comparison. The pre-change v0.5.0 archive remains recoverable under `/tmp/deepfilter-license-pre-simplification-20260811/`.
+
 ## Final Acceptance and Manual Host Flow
 
 After every Progress entry through Step 4.G is `COMPLETE`, increment the durable final-attempt counter before running the single Final Acceptance Command. On its first exit 0, set Final verification to PASS and stop all automated verification. Do not rerun Rust tests or pluginval after the green release bundle build.
@@ -535,6 +550,8 @@ With approval for any required user plugin-directory and Resolve changes, run th
 - [x] Step 5.1: COMPLETE — 2026-08-11 12:40Z; project metadata and README now select MIT, the former Apache project text is retained only under `third-party-licenses/`, the packaging script and English user guidance are implemented, and the supplied screenshot plus matching 48 kHz/24-bit/mono WAV demos are repository-only assets. Static script parsing and `git diff --check` exited 0; bounded inspection confirmed the ZIP definition contains neither image nor audio assets.
 - [x] Step 5.2: COMPLETE — 2026-08-11 12:41Z; Final Acceptance attempt 2/3 of exact `cargo xtask bundle deepfilter-vst --release` exited 0 in 1.77 seconds and recreated the current-source ad-hoc-signed VST3 and CLAP bundles. The same eight non-fatal warnings remain; DSP tests and pluginval were not repeated because no DSP source changed.
 - [x] Step 5.G: COMPLETE — 2026-08-11 12:44Z; execution 1/2 was rejected only after inventory inspection found AppleDouble entries. After the documented `ditto --norsrc` repair, execution 2/2 exited 0 in 2.42 seconds, the sidecar verified, and inventory contained only both plug-in bundles plus English README, MIT/third-party license material, release metadata, and checksums. No PNG/WAV, upload, or installation occurred. Accepted ZIP SHA-256: `5a84c441835bbeefa69c20a301e9c07b3e99a5fc5821b3fa1d35fadb12a36ce8`.
+- [x] Step 6.1: COMPLETE — 2026-08-11 13:39Z; removed optional dependency/license prose and retained the project MIT terms, applicable third-party notices/texts, the unresolved embedded-model warning, and exact VST attribution. Static script and whitespace checks passed; accepted binaries remain unchanged.
+- [x] Step 6.G: COMPLETE — 2026-08-11 13:43Z; execution 2/2 produced the simplified v0.5.0 package. Sidecar/ZIP/inventory/license inspection passed, no AppleDouble/PNG/WAV entries were present, and VST3/CLAP binary hashes matched the pre-change package exactly. Accepted ZIP SHA-256: `b50c4e97073743cc91c905a04e9c349de4bd96fc181f8f3d3dcae34d4fb43204`.
 - [ ] Manual Resolve host flow: DEFERRED_BY_USER — 2026-08-11 04:43Z; the user will conduct the DaVinci Resolve 20 test later. Codex did not copy/install the bundle or operate/restart Resolve. SC-11 remains the only open success criterion.
 
 ## Decision Log
@@ -610,5 +627,5 @@ With approval for any required user plugin-directory and Resolve changes, run th
 - Automated implementation and release acceptance are complete. The default locked bundle uses nice-plug and official DeepFilterNet v0.5.6 LL only; the standard model remains an explicit alternate build feature.
 - Verified reported/measured latency is 1764 samples at 44.1 kHz, 1440 at 48 kHz, and 3840 at 96 kHz. Tests and pluginval cover mapping, reset, aligned fallback, allocation assertions, non-48 kHz conversion, and shared real-time/offline DSP.
 - Final release artifacts were recreated at `target/bundled/deepfilter-vst.vst3` and `target/bundled/deepfilter-vst.clap` on final attempt 2/3 after the MIT manifest change. Hash and direct bundle-architecture record remain part of the approved manual-host evidence because the automated green stop is active.
-- The MIT-only Apple Silicon distribution candidate is `dist/DeepFilterNR-v0.1.0-macos-arm64.zip` with SHA-256 sidecar and accepted hash `5a84c441835bbeefa69c20a301e9c07b3e99a5fc5821b3fa1d35fadb12a36ce8`. It was prepared locally only; publishing remains deferred pending upstream model-weight licensing clarification.
+- The current MIT Apple Silicon distribution candidate is `dist/DeepFilterNR-v0.5.0-macos-arm64.zip` with SHA-256 sidecar and accepted hash `b50c4e97073743cc91c905a04e9c349de4bd96fc181f8f3d3dcae34d4fb43204`. Its license prose is reduced to required notices and the unresolved model warning. It was prepared locally only; publishing remains deferred pending upstream model-weight licensing clarification.
 - Remaining completion condition: SC-11, the single predeclared Resolve 20 playback and Deliver smoke flow, was deferred by the user for manual execution at a later date.

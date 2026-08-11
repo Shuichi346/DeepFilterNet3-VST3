@@ -17,8 +17,8 @@
   licenses, notices, and SHA-256 checksums.
 - Added a plug-in screenshot and matching effect-off/effect-on WAV demos to
   the repository README. These media assets are excluded from release ZIPs.
-- Added locked-dependency and embedded-model notices, including the unresolved
-  upstream pretrained-model redistribution clarification.
+- Added the required Apache-2.0, MIT, ISC, and Unicode notices, including the
+  unresolved upstream pretrained-model redistribution clarification.
 
 ### Changed
 
@@ -28,6 +28,9 @@
   identities.
 - Changed the project license from `MIT OR Apache-2.0` to MIT. Apache-2.0 text
   is retained only as clearly separated third-party license material.
+- Simplified repository and release-package license sections by removing
+  dependency-purpose prose and license-expression tables while retaining
+  required notices and attribution.
 - Moved model inference and persistent sample-rate conversion off the audio
   callback and aligned missing or degraded wet output with the delayed dry
   timeline instead of emitting stale or silent audio.

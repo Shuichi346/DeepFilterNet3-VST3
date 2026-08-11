@@ -38,6 +38,10 @@ Project instructions for coding agents working in this repository.
 - Keep the project license as MIT in `plugin/Cargo.toml` and root `LICENSE`.
   Treat files under `third-party-licenses/` and `THIRD_PARTY_NOTICES.md` as
   third-party terms, not alternative project licenses.
+- Keep license documentation concise: do not restore dependency-purpose prose
+  or license-expression tables. Preserve the embedded-model redistribution
+  warning, required MIT/ISC notices, canonical Apache-2.0 and Unicode texts,
+  and the exact VST trademark attribution in repository and package output.
 - After a successful release bundle build, create the Apple Silicon archive
   only with `./scripts/package-release.sh`. The script must keep verifying thin
   arm64 binaries, valid ad-hoc signatures, ZIP integrity, and SHA-256 output;
