@@ -1,5 +1,18 @@
 # Notes
 
+## 2026-08-12
+
+- The current manual-validation target is DaVinci Resolve 21; Resolve 20 is an
+  older version retained only in the original requirements history.
+- The user confirmed that DaVinci Resolve 21 completed a successful Deliver
+  export with the plug-in applied.
+- Resolve 21 displayed no plug-in UI. This is expected because the plug-in
+  exposes host parameters but supplies no custom editor. The README screenshot
+  shows Audacity's host-generated parameter interface.
+- The successful Deliver is partial SC-11 evidence. The sample rate, bundle
+  hash, host latency, repeat-render measurements, playback interactions, and
+  non-48 kHz case were not recorded, so the full host matrix remains open.
+
 ## 2026-08-11
 
 - The project and plug-in release version was changed from 0.1.0 to 0.5.0;
@@ -38,8 +51,8 @@
 - DeepFilterNet issue #697 still had no answer confirming redistribution terms
   for pretrained model archives, so the binary package was prepared locally
   but not published.
-- The DaVinci Resolve 20 playback and Deliver smoke test was deferred by the
-  user. `PLANS.md` leaves SC-11 open; Codex did not install the bundle or
-  operate Resolve.
+- The original requirements targeted DaVinci Resolve 20, which was the older
+  host version at the time of planning. That test was deferred and was later
+  superseded by the Resolve 21 user evidence recorded above.
 - Cargo registry sandbox denials were avoided by granting the Cargo commands
   elevated cache access. No persistent Codex setting change was required.

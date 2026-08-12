@@ -13,7 +13,9 @@ DeepFilterNet3 VST3 is a macOS audio plugin that embeds the official DeepFilterN
 
 ## Preview
 
-<img src="githubreadme/screensho.png" alt="DeepFilter Noise Reduction plugin window with Attenuation Limit and Mix controls" width="480">
+<img src="githubreadme/screensho.png" alt="Audacity host-generated parameter window for DeepFilter Noise Reduction" width="480">
+
+Shown in Audacity. This is Audacity's host-generated parameter interface, not a custom editor supplied by the plug-in. Other hosts may present the parameters differently or provide no plug-in window.
 
 ## Audio demo
 
@@ -68,7 +70,7 @@ The plug-in bypassed and enabled:
 
 The current implementation is built and tested on Apple Silicon with macOS 26. Automated validation includes 24 Rust tests and pluginval strictness 5 with callback allocation assertions. pluginval exercised 44.1, 48, and 96 kHz processing and automation and completed with `SUCCESS`.
 
-DaVinci Resolve 20 is the intended host, but the final interactive playback and Deliver smoke test has not yet been completed. Windows, Linux, and Intel macOS builds have not been validated.
+A user-confirmed test in DaVinci Resolve 21 completed a successful Deliver export with the plug-in applied. Resolve 21 did not display a plug-in UI, which is expected because this plug-in does not provide a custom editor. The broader repeatability, interaction, latency, and multi-rate Resolve smoke-test matrix has not yet been completed. Windows, Linux, and Intel macOS builds have not been validated.
 
 ## Audio behavior
 
@@ -155,6 +157,8 @@ Restart or rescan the host after installation. Local builds are not distributed 
 
 The host receives the plugin's calculated latency during initialization. If the requested host configuration is unsupported, the plugin remains available but passes audio through unchanged and reports zero latency.
 
+The plug-in exposes host parameters but does not provide a custom editor. Parameter controls therefore depend on the host: the preview above is Audacity's generated interface, while DaVinci Resolve 21 may not display a plug-in window.
+
 ## Parameters
 
 | Parameter | Range | Default | Behavior |
@@ -240,7 +244,8 @@ Confirm that the VST3 or CLAP directory matches the installation paths above, th
 - Real-time scheduling delays can temporarily substitute aligned dry audio for missing enhanced output.
 - Worker/model startup is bounded to ten seconds; a startup failure selects direct bypass.
 - Unsupported rate or buffer configurations select direct bypass rather than resampling approximately.
-- DaVinci Resolve playback and Deliver behavior still require the final manual smoke check.
+- A successful Deliver export has been user-confirmed in DaVinci Resolve 21, but the full repeatability, interaction, latency, and multi-rate host matrix remains unverified.
+- The plug-in has no custom editor; parameter presentation depends on the host, and DaVinci Resolve 21 may show no plug-in UI.
 - Only the Apple Silicon macOS configuration described above has been validated.
 
 ## License

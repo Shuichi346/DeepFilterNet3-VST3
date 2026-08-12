@@ -10,17 +10,17 @@ The real-time audio callback will not run `DfTract` directly because v0.5.6's Tr
 
 ## Resume Here
 
-- Updated: 2026-08-11 13:43Z
+- Updated: 2026-08-12 03:46Z
 - Overall status: PAUSED — simplified release package prepared; publication deferred
-- Active phase: License notice simplification complete
+- Active phase: Documentation follow-up complete
 - Active step: None
 - Last verified checkpoint: Release Packaging PASS on Step 5.G execution 2/2; Final Acceptance PASS on attempt 2/3.
-- Completed since previous checkpoint: Removed optional license explanations from both repository READMEs, third-party notices, and the package README; retained the project MIT license, applicable third-party terms, the unresolved embedded-model warning, and the required VST attribution. Regenerated the v0.5.0 ZIP from unchanged accepted binaries.
-- In progress: None. No release upload, plug-in installation, or host mutation was performed.
+- Completed since previous checkpoint: The user reported that DaVinci Resolve 21 completed a successful Deliver export with the plug-in applied. The user also identified the README screenshot as Audacity's host-generated parameter UI rather than a custom plug-in editor.
+- In progress: None. README and durable validation records now distinguish the current Resolve 21 target and partial Deliver evidence from the older Resolve 20 requirements history, and identify the screenshot as Audacity's host-generated UI. No source, manifest, package, release upload, plug-in installation, or host mutation was involved.
 - Next action: After upstream confirms pretrained-model redistribution terms, the user may attach the v0.5.0 ZIP and `.sha256` sidecar to a GitHub Release. The deferred manual Resolve flow remains separately available.
-- Blockers / decisions needed: Manual SC-11 evidence remains deferred. Upstream DeepFilterNet issue #697 still leaves pretrained-model redistribution terms unconfirmed, so the package may be prepared locally but must not be described as legally cleared or uploaded by Codex.
+- Blockers / decisions needed: The Resolve 21 Deliver result is useful partial host evidence, but the full SC-11 repeatability, interaction, latency, and multi-rate matrix remains deferred. Upstream DeepFilterNet issue #697 still leaves pretrained-model redistribution terms unconfirmed, so the package may be prepared locally but must not be described as legally cleared or uploaded by Codex.
 - Final verification: PASS — attempt 2/3; exact `cargo xtask bundle deepfilter-vst --release` exited 0 at 2026-08-11 12:41Z and recreated both release bundles after the MIT manifest change. Eight previously recorded non-fatal warnings remain.
-- Working tree state: `/Users/shuichi/Documents/GitHub/DeepFilterNet3-VST3`; branch `updatenow`; HEAD `e839c91d8eae4ac46091cd332658621ddbd4609b`; modified: `PLANS.md`, `README.md`, `README_ja.md`, `THIRD_PARTY_NOTICES.md`, `scripts/package-release.sh`, `third-party-licenses/Apache-2.0.txt`; untracked: `third-party-licenses/Unicode-3.0.txt`. Generated `dist/` artifacts remain ignored.
+- Working tree state: `/Users/shuichi/Documents/GitHub/DeepFilterNet3-VST3`; branch `updatenow`; HEAD `90139c4`; documentation follow-up modifies `PLANS.md`, `README.md`, and `NOTES.md`. Generated `dist/` artifacts remain ignored.
 - Evidence: Step 6.G execution 2/2 created `dist/DeepFilterNR-v0.5.0-macos-arm64.zip`; ZIP integrity and sidecar verification passed, required license files were present, no AppleDouble/PNG/WAV entries were present, and both VST3/CLAP binary hashes remained `6b9e074022a3db8cd5ffcf01d1b2fc49943d51e7a3735195d42b6a8b6c4d8e56`. Accepted ZIP SHA-256: `b50c4e97073743cc91c905a04e9c349de4bd96fc181f8f3d3dcae34d4fb43204`.
 
 ## Execution Contract
@@ -44,7 +44,7 @@ The real-time audio callback will not run `DfTract` directly because v0.5.6's Tr
 3. VST3 is the release target, but the existing CLAP export and CLAP ID remain because removing them would be an unnecessary host-compatibility change.
 4. The official LL model is the default build. The official standard model remains available only through a mutually exclusive Cargo build feature; it is never a plugin parameter or runtime selection.
 5. Supported enhanced rates are integer host rates for which the fixed-output rubato configuration fits the declared maximum host quantum, including 44.1, 48, 88.2, 96, 176.4, and 192 kHz. Any invalid or unsupported configuration initializes as direct, zero-latency bypass instead of failing or producing silence.
-6. DaVinci Resolve 20 and pluginval are installed locally. Host validation is still a bounded manual acceptance flow, not a substitute for deterministic Rust tests.
+6. DaVinci Resolve 21 and pluginval are installed locally. Resolve 20 was the older version named by the original requirements and is no longer the validation target. The actual user host and current manual-validation target is Resolve 21. Host validation is still a bounded manual acceptance flow, not a substitute for deterministic Rust tests.
 7. No commit, push, release upload, code signing, notarization, or system-wide plugin installation is authorized by this plan.
 8. The user selected MIT as the sole project license. Third-party components retain their own licenses and notices.
 
@@ -188,7 +188,7 @@ The real-time audio callback will not run `DfTract` directly because v0.5.6's Tr
 - [x] SC-8: pluginval strictness 5 passes the debug allocation-asserting VST3, and code inspection confirms no callback locks, heap growth, draining, model/resampler calls, or logging.
 - [x] SC-9: Real-time/buffered/offline use the same DSP core; offline waits are bounded and worker fault/timeout produces aligned dry rather than silence or a hang.
 - [x] SC-10: README and license/third-party notices match the final locked dependency tree and distinguish verified facts from absent model-specific licensing information.
-- [ ] SC-11: The predeclared one-pass DaVinci Resolve 20 flow succeeds on the final bundle: 48 kHz playback and two Deliver renders are non-silent and repeatable across stop/play, seek, bypass toggle, and parameter changes; one 44.1 or 96 kHz playback/Deliver is non-silent; host latency agrees with the recorded impulse result.
+- [ ] SC-11: The bounded DaVinci Resolve 21 flow succeeds on the final bundle: 48 kHz playback and two Deliver renders are non-silent and repeatable across stop/play, seek, bypass toggle, and parameter changes; one 44.1 or 96 kHz playback/Deliver is non-silent; host latency agrees with the recorded impulse result. One successful Resolve 21 Deliver is already user-confirmed, but the remaining observations and measurements are not recorded.
 - [x] SC-12: The MIT-only packaging workflow produces a verified Apple Silicon ZIP plus SHA-256 sidecar from the rebuilt release bundles, includes both formats and required English guidance/notices, and performs no publication or installation.
 
 ## Verification Contract
@@ -200,7 +200,7 @@ The real-time audio callback will not run `DfTract` directly because v0.5.6's Tr
 - Timeout: 15 minutes
 - Maximum final attempts: 3 total; never reset on resume.
 - Step checks: Only the exact checks declared by Steps 1.G, 1.3, 3.2, 3.G, and 4.G. Step 3.2 has a user-revised maximum of 4 executions after one sandbox-only failure and a later production startup-bound repair; Step 3.G has a user-revised maximum of 3 executions after both initial attempts stopped at that startup bound before pluginval. All other step checks retain at most 2 total executions. Artifact/code inspection is not a command execution.
-- Manual smoke check: After the first successful Final Acceptance Command and only with approval for any user plugin-directory/Resolve mutation, run one bounded DaVinci Resolve 20 flow using the final bundle: at 48 kHz verify mono and stereo playback, Mix/Attenuation changes, bypass toggle, stop/play, and seek; Deliver the same short section twice and compare non-silence/duration/checksum; then repeat playback and one Deliver at either 44.1 or 96 kHz and record the host-displayed latency against the impulse-test value. Run this flow once for the final implementation state.
+- Manual smoke check: The actual manual-validation host is DaVinci Resolve 21. The user has already confirmed one successful Deliver export with the plug-in applied. To complete SC-11, record the final bundle identity and project rate; at 48 kHz verify mono and stereo playback, Mix/Attenuation changes, bypass toggle, stop/play, and seek; Deliver the same short section twice and compare non-silence/duration/checksum; then repeat playback and one Deliver at either 44.1 or 96 kHz and record the host-displayed latency against the impulse-test value. Only actions that require Codex to mutate the user plug-in directory or Resolve state require separate approval.
 - Failure policy: Repair only failures attributable to planned changes and within SC-1 through SC-12. Record unrelated findings without fixing them. If the final command cannot pass because it includes an unrelated pre-existing failure, block for plan revision rather than weakening the command.
 - Green stop rule: The first in-budget exit `0` ends automated verification. Run no additional tests, lint, typecheck, coverage, build, or review commands afterward; only the predeclared manual smoke check may follow.
 - Packaging extension authorized 2026-08-11: changing `plugin/Cargo.toml` to MIT invalidates final attempt 1. Before packaging, record and run final attempt 2/3 using the unchanged exact Final Acceptance Command. Then run `./scripts/package-release.sh`; expected exit 0; timeout 2 minutes; maximum 2 executions. The script's own architecture, signature, ZIP integrity, and checksum checks are the SC-12 gate. Do not rerun Rust tests or pluginval because production DSP code is unchanged.
@@ -500,6 +500,15 @@ Only the coordinating main agent writes this plan. Write-based implementation re
 - **Verification:** `./scripts/package-release.sh`; expected exit 0; timeout 2 minutes; maximum 2 executions under this user-authorized documentation revision. Follow with read-only archive inspection.
 - **Status:** COMPLETE — 2026-08-11 13:43Z; execution 1/2 exposed one package-only `Cargo.lock` reference and combined ISC wording, which were simplified/corrected. Execution 2/2 passed architecture/signature checks, ZIP integrity, sidecar verification, inventory inspection, and unchanged-binary hash comparison. The pre-change v0.5.0 archive remains recoverable under `/tmp/deepfilter-license-pre-simplification-20260811/`.
 
+### Phase 7 — Resolve 21 and editor documentation follow-up
+
+#### Step 7.1 — Record user-confirmed host behavior and identify the screenshot UI
+
+- **Location:** `README.md`, `PLANS.md`, `NOTES.md`
+- **Action:** Record the user's successful DaVinci Resolve 21 Deliver result without treating it as completion of the broader SC-11 matrix. Clarify that the README screenshot shows Audacity's host-generated parameter interface and that the plug-in supplies no custom editor, so Resolve 21 may display no plug-in window.
+- **Verification:** Inspect the rendered-image reference and surrounding README wording, confirm the statements match `Plugin::editor()` remaining at nice-plug's default `None`, run `git diff --check`, and perform no build or test because production source, manifests, and binaries are unchanged.
+- **Status:** COMPLETE — 2026-08-12 03:46Z; README and validation records now identify Resolve 21 as the current host target, record one successful user-confirmed Deliver without closing SC-11, identify the screenshot as Audacity's generated UI, and explain the expected absence of a custom editor in Resolve 21. Image-reference inspection and `git diff --check` passed; no build or test was run because production source, manifests, and binaries are unchanged.
+
 ## Final Acceptance and Manual Host Flow
 
 After every Progress entry through Step 4.G is `COMPLETE`, increment the durable final-attempt counter before running the single Final Acceptance Command. On its first exit 0, set Final verification to PASS and stop all automated verification. Do not rerun Rust tests or pluginval after the green release bundle build.
@@ -552,7 +561,8 @@ With approval for any required user plugin-directory and Resolve changes, run th
 - [x] Step 5.G: COMPLETE — 2026-08-11 12:44Z; execution 1/2 was rejected only after inventory inspection found AppleDouble entries. After the documented `ditto --norsrc` repair, execution 2/2 exited 0 in 2.42 seconds, the sidecar verified, and inventory contained only both plug-in bundles plus English README, MIT/third-party license material, release metadata, and checksums. No PNG/WAV, upload, or installation occurred. Accepted ZIP SHA-256: `5a84c441835bbeefa69c20a301e9c07b3e99a5fc5821b3fa1d35fadb12a36ce8`.
 - [x] Step 6.1: COMPLETE — 2026-08-11 13:39Z; removed optional dependency/license prose and retained the project MIT terms, applicable third-party notices/texts, the unresolved embedded-model warning, and exact VST attribution. Static script and whitespace checks passed; accepted binaries remain unchanged.
 - [x] Step 6.G: COMPLETE — 2026-08-11 13:43Z; execution 2/2 produced the simplified v0.5.0 package. Sidecar/ZIP/inventory/license inspection passed, no AppleDouble/PNG/WAV entries were present, and VST3/CLAP binary hashes matched the pre-change package exactly. Accepted ZIP SHA-256: `b50c4e97073743cc91c905a04e9c349de4bd96fc181f8f3d3dcae34d4fb43204`.
-- [ ] Manual Resolve host flow: DEFERRED_BY_USER — 2026-08-11 04:43Z; the user will conduct the DaVinci Resolve 20 test later. Codex did not copy/install the bundle or operate/restart Resolve. SC-11 remains the only open success criterion.
+- [x] Step 7.1: COMPLETE — 2026-08-12 03:46Z; updated `README.md`, `PLANS.md`, and `NOTES.md` with the current Resolve 21 target, the user-confirmed successful Deliver, the remaining SC-11 evidence gap, and the Audacity-generated screenshot/custom-editor distinction. `git diff --check` passed and the screenshot link resolves locally.
+- [ ] Manual Resolve host flow: PARTIAL_USER_EVIDENCE — 2026-08-12 03:46Z; the user reports that DaVinci Resolve 21 successfully completed a Deliver export with the plug-in applied. Resolve 21 displayed no plug-in UI, consistent with the implementation providing parameters but no custom editor. Sample rate, bundle hash, host latency, repeat-render hashes/durations/levels, stop/play, seek, bypass, parameter-change coverage, and the non-48 kHz case were not recorded, so SC-11 remains open.
 
 ## Decision Log
 
@@ -608,6 +618,8 @@ With approval for any required user plugin-directory and Resolve changes, run th
 - pluginval strictness 5 passed the allocation-asserting VST3 and exercised 44.1/48/96 kHz block sizes and automation. Its separate optional Steinberg `vst3 validator` subtest reported that no validator path was configured and was skipped; this did not fail the declared pluginval command.
 - The pinned v0.5.6 repository contains both embedded DeepFilterNet3 ONNX archives under `models/`, while neither archive contains a license, copying, or notice file of its own. Repository-level MIT/Apache files are present; the third-party notice reports only those observable facts.
 - The final release build succeeds with eight warnings confined to private visibility bounds/interfaces and test/status helper dead code. They do not prevent bundle creation and cannot be changed after the green stop without invalidating final/manual evidence.
+- The README screenshot was captured in Audacity and shows Audacity's host-generated parameter interface. The plug-in does not override nice-plug's `Plugin::editor()` default, so no custom editor is supplied and DaVinci Resolve 21 may show no plug-in window.
+- The user confirmed one successful DaVinci Resolve 21 Deliver export. This is partial host evidence only because the predeclared sample-rate, repeatability, interaction, latency, and artifact measurements were not recorded.
 
 ## Official Source Record
 
@@ -628,4 +640,5 @@ With approval for any required user plugin-directory and Resolve changes, run th
 - Verified reported/measured latency is 1764 samples at 44.1 kHz, 1440 at 48 kHz, and 3840 at 96 kHz. Tests and pluginval cover mapping, reset, aligned fallback, allocation assertions, non-48 kHz conversion, and shared real-time/offline DSP.
 - Final release artifacts were recreated at `target/bundled/deepfilter-vst.vst3` and `target/bundled/deepfilter-vst.clap` on final attempt 2/3 after the MIT manifest change. Hash and direct bundle-architecture record remain part of the approved manual-host evidence because the automated green stop is active.
 - The current MIT Apple Silicon distribution candidate is `dist/DeepFilterNR-v0.5.0-macos-arm64.zip` with SHA-256 sidecar and accepted hash `b50c4e97073743cc91c905a04e9c349de4bd96fc181f8f3d3dcae34d4fb43204`. Its license prose is reduced to required notices and the unresolved model warning. It was prepared locally only; publishing remains deferred pending upstream model-weight licensing clarification.
-- Remaining completion condition: SC-11, the single predeclared Resolve 20 playback and Deliver smoke flow, was deferred by the user for manual execution at a later date.
+- DaVinci Resolve 21 has one user-confirmed successful Deliver export with the plug-in applied. The plug-in has no custom editor; the README image is Audacity's generated parameter interface, and Resolve 21 may display no plug-in window.
+- Remaining completion condition: SC-11 remains open because its full repeatability, interaction, latency, and multi-rate evidence was not captured by the user-reported Resolve 21 export.
