@@ -85,6 +85,7 @@ require_bundle "${SOURCE_VST3}"
 require_bundle "${SOURCE_CLAP}"
 require_file "${REPO_ROOT}/LICENSE"
 require_file "${REPO_ROOT}/third-party-licenses/Apache-2.0.txt"
+require_file "${REPO_ROOT}/third-party-licenses/Embedded-Font-Licenses.txt"
 require_file "${REPO_ROOT}/third-party-licenses/Unicode-3.0.txt"
 require_file "${REPO_ROOT}/THIRD_PARTY_NOTICES.md"
 
@@ -121,6 +122,8 @@ trap cleanup EXIT HUP INT TERM
 /usr/bin/ditto "${REPO_ROOT}/LICENSE" "${payload_dir}/LICENSE"
 /usr/bin/ditto "${REPO_ROOT}/third-party-licenses/Apache-2.0.txt" \
     "${payload_dir}/Third-Party-Licenses/Apache-2.0.txt"
+/usr/bin/ditto "${REPO_ROOT}/third-party-licenses/Embedded-Font-Licenses.txt" \
+    "${payload_dir}/Third-Party-Licenses/Embedded-Font-Licenses.txt"
 /usr/bin/ditto "${REPO_ROOT}/third-party-licenses/Unicode-3.0.txt" \
     "${payload_dir}/Third-Party-Licenses/Unicode-3.0.txt"
 /usr/bin/ditto "${REPO_ROOT}/THIRD_PARTY_NOTICES.md" \

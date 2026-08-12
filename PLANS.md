@@ -10,18 +10,18 @@ The real-time audio callback will not run `DfTract` directly because v0.5.6's Tr
 
 ## Resume Here
 
-- Updated: 2026-08-12 03:46Z
-- Overall status: PAUSED — simplified release package prepared; publication deferred
-- Active phase: Documentation follow-up complete
+- Updated: 2026-08-12 04:59Z
+- Overall status: COMPLETE — refined two-slider editor and release bundles
+- Active phase: Phase 9 complete
 - Active step: None
-- Last verified checkpoint: Release Packaging PASS on Step 5.G execution 2/2; Final Acceptance PASS on attempt 2/3.
-- Completed since previous checkpoint: The user reported that DaVinci Resolve 21 completed a successful Deliver export with the plug-in applied. The user also identified the README screenshot as Audacity's host-generated parameter UI rather than a custom plug-in editor.
-- In progress: None. README and durable validation records now distinguish the current Resolve 21 target and partial Deliver evidence from the older Resolve 20 requirements history, and identify the screenshot as Audacity's host-generated UI. No source, manifest, package, release upload, plug-in installation, or host mutation was involved.
-- Next action: After upstream confirms pretrained-model redistribution terms, the user may attach the v0.5.0 ZIP and `.sha256` sidecar to a GitHub Release. The deferred manual Resolve flow remains separately available.
-- Blockers / decisions needed: The Resolve 21 Deliver result is useful partial host evidence, but the full SC-11 repeatability, interaction, latency, and multi-rate matrix remains deferred. Upstream DeepFilterNet issue #697 still leaves pretrained-model redistribution terms unconfirmed, so the package may be prepared locally but must not be described as legally cleared or uploaded by Codex.
-- Final verification: PASS — attempt 2/3; exact `cargo xtask bundle deepfilter-vst --release` exited 0 at 2026-08-11 12:41Z and recreated both release bundles after the MIT manifest change. Eight previously recorded non-fatal warnings remain.
-- Working tree state: `/Users/shuichi/Documents/GitHub/DeepFilterNet3-VST3`; branch `updatenow`; HEAD `90139c4`; documentation follow-up modifies `PLANS.md`, `README.md`, and `NOTES.md`. Generated `dist/` artifacts remain ignored.
-- Evidence: Step 6.G execution 2/2 created `dist/DeepFilterNR-v0.5.0-macos-arm64.zip`; ZIP integrity and sidecar verification passed, required license files were present, no AppleDouble/PNG/WAV entries were present, and both VST3/CLAP binary hashes remained `6b9e074022a3db8cd5ffcf01d1b2fc49943d51e7a3735195d42b6a8b6c4d8e56`. Accepted ZIP SHA-256: `b50c4e97073743cc91c905a04e9c349de4bd96fc181f8f3d3dcae34d4fb43204`.
+- Last verified checkpoint: Final Acceptance PASS on attempt 4/4; exact refined-GUI release bundle command exited 0.
+- Completed since previous checkpoint: The user supplied focused/unfocused screenshots, approved implementation after a pre-code feasibility report, and confirmed that no additional GUI dependency is needed. Local `nice-plug-egui` 0.3.0 source shows its stock `ParamSlider` initializes keyboard entry from the complete parameter display string, including the unit.
+- In progress: None. The final VST3 and CLAP bundles contain the refined fixed 420 × 190 editor with two composite parameter controls and unit-separated numeric entry.
+- Next action: Optional manual host inspection of the final refined-GUI bundle requires approval for any plug-in-directory or Resolve mutation. The full SC-11 Resolve matrix remains separately open.
+- Blockers / decisions needed: None for implementation. Upstream DeepFilterNet issue #697 still leaves pretrained-model redistribution terms unconfirmed, so no package may be described as legally cleared or uploaded by Codex.
+- Final verification: PASS — attempt 4/4; exact `cargo xtask bundle deepfilter-vst --release` exited 0 at 2026-08-12 04:59Z and recreated both refined-GUI release bundles. The same eight pre-existing non-fatal warnings remain.
+- Working tree state: `/Users/shuichi/Documents/GitHub/DeepFilterNet3-VST3`; branch `GUI`; HEAD `150fb87`; GUI source, manifests/lockfile, and `PLANS.md` are modified. Generated `dist/` artifacts remain ignored and represent the superseded non-GUI candidate.
+- Evidence: Step 9.G execution 2/2 passed all 28 tests, built current allocation-asserting VST3/CLAP bundles, and pluginval strictness 5 ended with `SUCCESS`. Final attempt 4/4 then recreated `target/bundled/deepfilter-vst.vst3` and `target/bundled/deepfilter-vst.clap` from the refined source in 12.23 seconds.
 
 ## Execution Contract
 
@@ -138,6 +138,13 @@ The real-time audio callback will not run `DfTract` directly because v0.5.6's Tr
 - Create a SHA-256 sidecar for the ZIP, refuse to overwrite an existing package, and leave GitHub publishing manual.
 - Document the command in README `Development and testing`. State that quarantine removal is solely for users who trust the downloaded archive, and use no broad or `sudo` command.
 
+### R12 — Compact custom editor
+
+- Supply a fixed-size custom editor for both VST3 and CLAP using the maintained nice-plug GUI adapter compatible with pinned nice-plug 0.2.3.
+- Show exactly two interactive controls: one horizontal slider for `Attenuation Limit` and one horizontal slider for `Mix`. Use English labels and value text; do not add model selection, waveform display, meters, bypass, presets, branding controls, or any other control.
+- Bind the sliders to the existing `atten_lim` and `mix` parameters through `ParamSetter` begin/set/end gestures so host automation and external parameter changes stay synchronized.
+- Preserve the existing parameter IDs, ranges, defaults, formatters, smoothing, DSP reads, plug-in identities, and audio callback behavior. GUI rendering and interaction must remain outside the audio callback.
+
 ## Tech Stack and Conventions
 
 - Workspace: Rust/Cargo workspace with packages `deepfilter-vst` and `xtask`.
@@ -190,20 +197,24 @@ The real-time audio callback will not run `DfTract` directly because v0.5.6's Tr
 - [x] SC-10: README and license/third-party notices match the final locked dependency tree and distinguish verified facts from absent model-specific licensing information.
 - [ ] SC-11: The bounded DaVinci Resolve 21 flow succeeds on the final bundle: 48 kHz playback and two Deliver renders are non-silent and repeatable across stop/play, seek, bypass toggle, and parameter changes; one 44.1 or 96 kHz playback/Deliver is non-silent; host latency agrees with the recorded impulse result. One successful Resolve 21 Deliver is already user-confirmed, but the remaining observations and measurements are not recorded.
 - [x] SC-12: The MIT-only packaging workflow produces a verified Apple Silicon ZIP plus SHA-256 sidecar from the rebuilt release bundles, includes both formats and required English guidance/notices, and performs no publication or installation.
+- [x] SC-13: The final VST3 and CLAP expose a compact fixed-size custom editor containing only English Attenuation Limit and Mix sliders; the editor reports the declared size, uses host parameter gestures, preserves all IDs/defaults/ranges, passed the declared Rust/editor plus pluginval gate, and was recreated by final attempt 3/3.
+- [x] SC-14: Each of the same two composite parameter controls presents a concise numeric value with a separate non-editable `dB` or `%` suffix; keyboard entry contains only numeric text, commits through `ParamSetter`, cancels or rejects invalid input safely, follows external parameter changes when not being edited, and the refined fixed-size editor passes its focused tests plus pluginval.
 
 ## Verification Contract
 
 - Profile: Personal / Lean
-- Scope ceiling: Success Criteria SC-1 through SC-11 only.
+- Scope ceiling: Success Criteria SC-1 through SC-14 only.
 - Final Acceptance Command: `cargo xtask bundle deepfilter-vst --release`
 - Working directory: `/Users/shuichi/Documents/GitHub/DeepFilterNet3-VST3`
 - Timeout: 15 minutes
-- Maximum final attempts: 3 total; never reset on resume.
+- Maximum final attempts: 4 total under the user-authorized Phase 9 GUI refinement; never reset again without another user contract change.
 - Step checks: Only the exact checks declared by Steps 1.G, 1.3, 3.2, 3.G, and 4.G. Step 3.2 has a user-revised maximum of 4 executions after one sandbox-only failure and a later production startup-bound repair; Step 3.G has a user-revised maximum of 3 executions after both initial attempts stopped at that startup bound before pluginval. All other step checks retain at most 2 total executions. Artifact/code inspection is not a command execution.
 - Manual smoke check: The actual manual-validation host is DaVinci Resolve 21. The user has already confirmed one successful Deliver export with the plug-in applied. To complete SC-11, record the final bundle identity and project rate; at 48 kHz verify mono and stereo playback, Mix/Attenuation changes, bypass toggle, stop/play, and seek; Deliver the same short section twice and compare non-silence/duration/checksum; then repeat playback and one Deliver at either 44.1 or 96 kHz and record the host-displayed latency against the impulse-test value. Only actions that require Codex to mutate the user plug-in directory or Resolve state require separate approval.
-- Failure policy: Repair only failures attributable to planned changes and within SC-1 through SC-12. Record unrelated findings without fixing them. If the final command cannot pass because it includes an unrelated pre-existing failure, block for plan revision rather than weakening the command.
+- Failure policy: Repair only failures attributable to planned changes and within SC-1 through SC-14. Record unrelated findings without fixing them. If the final command cannot pass because it includes an unrelated pre-existing failure, block for plan revision rather than weakening the command.
 - Green stop rule: The first in-budget exit `0` ends automated verification. Run no additional tests, lint, typecheck, coverage, build, or review commands afterward; only the predeclared manual smoke check may follow.
 - Packaging extension authorized 2026-08-11: changing `plugin/Cargo.toml` to MIT invalidates final attempt 1. Before packaging, record and run final attempt 2/3 using the unchanged exact Final Acceptance Command. Then run `./scripts/package-release.sh`; expected exit 0; timeout 2 minutes; maximum 2 executions. The script's own architecture, signature, ZIP integrity, and checksum checks are the SC-12 gate. Do not rerun Rust tests or pluginval because production DSP code is unchanged.
+- GUI extension authorized 2026-08-12: the custom editor invalidates final attempt 2's bundles and all later package/manual evidence for the GUI-bearing artifact. Step 8.1 may run `cargo check -p deepfilter-vst`; expected exit 0; timeout 10 minutes; maximum 3 executions after the user explicitly approved additional verification when execution 1 was sandbox-only denial and execution 2 produced the corrected editor diagnostic. Step 8.G may run the single combined command `cargo test -p deepfilter-vst --lib && cargo xtask bundle deepfilter-vst --features nice-plug/assert_process_allocs && /Applications/pluginval.app/Contents/MacOS/pluginval --strictness-level 5 --validate-in-process target/bundled/deepfilter-vst.vst3`; expected exit 0; timeout 15 minutes; maximum 2 executions. After documentation and notices match the new dependency tree, reserve final attempt 3/3 for the unchanged Final Acceptance Command. No release-package regeneration, installation, Resolve mutation, publication, or upload is authorized by this extension.
+- GUI refinement authorized 2026-08-12: the user's explicit implementation instruction adds Phase 9 and invalidates the Phase 8 final GUI artifacts without changing dependencies, parameter metadata, DSP, release documentation, or license inventory. Step 9.1 may run `cargo check -p deepfilter-vst`; expected exit 0; timeout 10 minutes; maximum 2 executions. Step 9.G may run the single combined command `cargo test -p deepfilter-vst --lib && cargo xtask bundle deepfilter-vst --features nice-plug/assert_process_allocs && /Applications/pluginval.app/Contents/MacOS/pluginval --strictness-level 5 --validate-in-process target/bundled/deepfilter-vst.vst3`; expected exit 0; timeout 15 minutes; maximum 2 executions. Reserve final attempt 4/4 for the unchanged Final Acceptance Command after Step 9.G. No release-package regeneration, installation, Resolve mutation, publication, or upload is authorized.
 
 ## Architecture Changes
 
@@ -509,9 +520,62 @@ Only the coordinating main agent writes this plan. Write-based implementation re
 - **Verification:** Inspect the rendered-image reference and surrounding README wording, confirm the statements match `Plugin::editor()` remaining at nice-plug's default `None`, run `git diff --check`, and perform no build or test because production source, manifests, and binaries are unchanged.
 - **Status:** COMPLETE — 2026-08-12 03:46Z; README and validation records now identify Resolve 21 as the current host target, record one successful user-confirmed Deliver without closing SC-11, identify the screenshot as Audacity's generated UI, and explain the expected absence of a custom editor in Resolve 21. Image-reference inspection and `git diff --check` passed; no build or test was run because production source, manifests, and binaries are unchanged.
 
+### Phase 8 — Compact two-slider custom editor
+
+#### Step 8.1 — Add and connect the editor
+
+- **Location:** `plugin/Cargo.toml`, `Cargo.lock`, new `plugin/src/editor.rs`, `plugin/src/lib.rs`, focused unit tests
+- **Action:** Pin `nice-plug-egui` 0.3.0 and its matching egui version, create one fixed-size editor with only the two existing parameter sliders, and return it from `Plugin::editor()`.
+- **Details:** Keep editor state outside the parameter map because the window is fixed-size. Use the official `ParamSlider`/`ParamSetter` integration, English labels, and no audio-to-GUI channel because no meters or model state are displayed. Add a focused test that the editor exists and reports the compact fixed size; retain all existing parameter behavior tests.
+- **Verification:** `cargo check -p deepfilter-vst`; expected exit 0; timeout 10 minutes; maximum 3 executions after the user-approved increase. Follow with bounded source/lock inspection and `git diff --check`; maps to R2, R8, R12, SC-2, SC-8, and SC-13.
+- **Status:** COMPLETE — 2026-08-12 04:15Z; user-approved execution 3/3 exited 0 in 2.62 seconds after the two unnecessary egui style calls were removed. The editor and full crate compile with only the same eight pre-existing warnings.
+
+#### Step 8.2 — Update GUI documentation and third-party notices
+
+- **Location:** `README.md`, `NOTES.md`, `THIRD_PARTY_NOTICES.md`, `PLANS.md`
+- **Action:** Replace the obsolete no-custom-editor claims, document the exact two-slider UI and superseded screenshot context, add required notice coverage for the final locked GUI dependency tree, and keep the unresolved model redistribution warning unchanged.
+- **Verification:** Bounded locked-dependency/license and documentation inspection plus `git diff --check`; no build command. Maps to R10, R12, SC-10, and SC-13.
+- **Status:** COMPLETE — 2026-08-12 04:15Z; README, CHANGELOG, NOTES, AGENTS, third-party notices, font-license material, and package inventory now match the custom editor. Apple Silicon locked-tree inspection, local license-source comparison, `zsh -n`, image/license existence checks, scoped stale-claim search, and `git diff --check` passed.
+
+#### Step 8.G — Custom editor validation gate
+
+- **Location:** plugin library tests and current allocation-asserting VST3 bundle
+- **Action:** Run all existing DSP tests plus the focused editor test, rebuild the allocation-asserting debug bundles, and run pluginval strictness 5 so editor creation, parameter/state behavior, buses, automation, and processing are exercised together.
+- **Verification:** One execution of `cargo test -p deepfilter-vst --lib && cargo xtask bundle deepfilter-vst --features nice-plug/assert_process_allocs && /Applications/pluginval.app/Contents/MacOS/pluginval --strictness-level 5 --validate-in-process target/bundled/deepfilter-vst.vst3`; expected exit 0; timeout 15 minutes; maximum 2 executions. Maps to SC-3 through SC-9 and SC-13.
+- **Status:** COMPLETE — 2026-08-12 04:21Z; execution 1/2 passed 25 tests then stopped on sandbox-only Cargo cache denial before bundling. Approved identical execution 2/2 passed all 25 tests, built both allocation-asserting debug bundles, and pluginval strictness 5 ended with `SUCCESS`, including Editor, Open Editor While Processing, Editor Automation, multi-rate processing/automation, state, parameters, and buses.
+
+#### Step 8.F — Rebuild final GUI-bearing release bundles
+
+- **Action:** After Step 8.G and documentation complete, record and run final attempt 3/3 using the unchanged Final Acceptance Command. Stop automated verification on the first exit 0.
+- **Verification:** `cargo xtask bundle deepfilter-vst --release`; expected exit 0; timeout 15 minutes; final attempt 3/3.
+- **Status:** COMPLETE — 2026-08-12 04:23Z; final attempt 3/3 of exact `cargo xtask bundle deepfilter-vst --release` exited 0 in 1 minute 34 seconds and recreated both GUI-bearing release bundles. Automated verification stopped immediately at the green stop.
+
+### Phase 9 — Numeric-entry separation and visual refinement
+
+#### Step 9.1 — Refine the two composite parameter controls
+
+- **Location:** `plugin/src/editor.rs` and focused editor tests
+- **Action:** Replace the stock value-text portion of `ParamSlider` with two custom composite parameter controls built from the already pinned egui stack. Keep one Attenuation Limit control and one Mix control, draw a rounded full-width track and concise value field, and show `dB`/`%` as non-editable suffixes outside the numeric buffer.
+- **Details:** Preserve the fixed 420 × 190 size, English labels, parameter IDs/ranges/defaults/formatters/smoothing, and audio callback. Mouse click/drag, double-click or Command-click reset, numeric Enter/focus-loss commit, and Escape cancel must route through `ParamSetter` begin/set/end gestures. GUI-only formatting uses one decimal for attenuation and integer percent for Mix without altering host-facing parameter formatting. Unfocused fields follow host automation; focused fields preserve the user's numeric-only buffer. Add pure focused tests for concise formatting, numeric sanitization, valid conversion, range clamping, and invalid input rejection.
+- **Verification:** Run `cargo check -p deepfilter-vst`; expected exit 0; timeout 10 minutes; maximum 2 executions. Follow with bounded source/diff inspection. Maps to R2, R8, R12, SC-2, SC-8, SC-13, and SC-14.
+- **Status:** COMPLETE — 2026-08-12 04:53Z; replaced the stock editor value area with two local composite controls using the existing egui stack. Numeric buffers exclude units, unfocused displays use `57.5`/`86`-style GUI-only precision, external values resynchronize outside editing, invalid entry is rejected, Escape cancels, and click/drag/reset/commit paths use `ParamSetter` gestures. `cargo check -p deepfilter-vst` execution 1/2 exited 0 with only the same eight pre-existing warnings; bounded source/parameter/diff inspection confirmed fixed size and unchanged parameter metadata.
+
+#### Step 9.G — Refined editor validation gate
+
+- **Location:** plugin library tests and current allocation-asserting VST3 bundle
+- **Action:** Run the focused editor tests with the existing DSP suite, rebuild the allocation-asserting debug bundles, and run pluginval strictness 5 against the current refined editor.
+- **Verification:** One execution of `cargo test -p deepfilter-vst --lib && cargo xtask bundle deepfilter-vst --features nice-plug/assert_process_allocs && /Applications/pluginval.app/Contents/MacOS/pluginval --strictness-level 5 --validate-in-process target/bundled/deepfilter-vst.vst3`; expected exit 0; timeout 15 minutes; maximum 2 executions. Maps to SC-3 through SC-9, SC-13, and SC-14.
+- **Status:** COMPLETE — 2026-08-12 04:58Z; execution 1/2 passed all 28 tests and current allocation-bundle creation before a sandbox-only pluginval abort reproduced by standalone `--help`. Approved execution 2/2 then passed all 28 tests, recreated both allocation-asserting bundles, and pluginval strictness 5 ended with `SUCCESS` after editor cold/warm/open-while-processing, editor automation, 44.1/48/96 kHz processing/automation, state, parameter, and bus checks. The optional external VST3 validator remained unconfigured/skipped; the same non-fatal macOS DPI warnings remain.
+
+#### Step 9.F — Rebuild final refined-GUI release bundles
+
+- **Action:** After Step 9.G completes, record final attempt 4/4 and run the unchanged Final Acceptance Command. Stop automated verification on the first exit 0.
+- **Verification:** `cargo xtask bundle deepfilter-vst --release`; expected exit 0; timeout 15 minutes; final attempt 4/4.
+- **Status:** COMPLETE — 2026-08-12 04:59Z; final attempt 4/4 of exact `cargo xtask bundle deepfilter-vst --release` exited 0 in 12.23 seconds and recreated both refined-GUI release bundles. Automated verification stopped immediately at the green stop.
+
 ## Final Acceptance and Manual Host Flow
 
-After every Progress entry through Step 4.G is `COMPLETE`, increment the durable final-attempt counter before running the single Final Acceptance Command. On its first exit 0, set Final verification to PASS and stop all automated verification. Do not rerun Rust tests or pluginval after the green release bundle build.
+After every required phase gate through Step 9.G is `COMPLETE`, increment the durable final-attempt counter before running the single Final Acceptance Command. On its first exit 0, set Final verification to PASS and stop all automated verification. Do not rerun Rust tests or pluginval after the green release bundle build.
 
 With approval for any required user plugin-directory and Resolve changes, run the one predeclared DaVinci flow exactly once on that final artifact. Record project sample rates, bundle path/hash, host-reported latency, playback observations, both 48 kHz render hashes/durations/peak levels, and the non-48 kHz render observation. A relevant code/config change after the manual flow invalidates it and consumes another final attempt only if the user authorizes continuation within the remaining budget.
 
@@ -562,7 +626,14 @@ With approval for any required user plugin-directory and Resolve changes, run th
 - [x] Step 6.1: COMPLETE — 2026-08-11 13:39Z; removed optional dependency/license prose and retained the project MIT terms, applicable third-party notices/texts, the unresolved embedded-model warning, and exact VST attribution. Static script and whitespace checks passed; accepted binaries remain unchanged.
 - [x] Step 6.G: COMPLETE — 2026-08-11 13:43Z; execution 2/2 produced the simplified v0.5.0 package. Sidecar/ZIP/inventory/license inspection passed, no AppleDouble/PNG/WAV entries were present, and VST3/CLAP binary hashes matched the pre-change package exactly. Accepted ZIP SHA-256: `b50c4e97073743cc91c905a04e9c349de4bd96fc181f8f3d3dcae34d4fb43204`.
 - [x] Step 7.1: COMPLETE — 2026-08-12 03:46Z; updated `README.md`, `PLANS.md`, and `NOTES.md` with the current Resolve 21 target, the user-confirmed successful Deliver, the remaining SC-11 evidence gap, and the Audacity-generated screenshot/custom-editor distinction. `git diff --check` passed and the screenshot link resolves locally.
-- [ ] Manual Resolve host flow: PARTIAL_USER_EVIDENCE — 2026-08-12 03:46Z; the user reports that DaVinci Resolve 21 successfully completed a Deliver export with the plug-in applied. Resolve 21 displayed no plug-in UI, consistent with the implementation providing parameters but no custom editor. Sample rate, bundle hash, host latency, repeat-render hashes/durations/levels, stop/play, seek, bypass, parameter-change coverage, and the non-48 kHz case were not recorded, so SC-11 remains open.
+- [ ] Manual Resolve host flow: INVALIDATED_PARTIAL_USER_EVIDENCE — 2026-08-12 04:21Z; the user reported that DaVinci Resolve 21 successfully completed a Deliver export with the earlier non-GUI bundle. That artifact displayed no plug-in UI because it supplied no custom editor. The result predates Phase 8, and sample rate, bundle hash, host latency, repeat-render hashes/durations/levels, stop/play, seek, bypass, parameter-change coverage, and the non-48 kHz case were not recorded, so SC-11 remains open for the GUI-bearing release artifact.
+- [x] Step 8.1: COMPLETE — 2026-08-12 04:15Z; fixed editor source, pinned dependencies, connection, and focused fixed-size test are present. User-approved compile-check execution 3/3 exited 0 with only the same eight pre-existing warnings. The later slider-width refinement is a value-only layout correction and will compile in Step 8.G.
+- [x] Step 8.2: COMPLETE — 2026-08-12 04:15Z; the required README and maintenance-doc skills kept the current UI claims concise and source-backed, the locked Apple Silicon GUI tree was inspected, embedded font notices/texts were added to the repository/package inventory, and static script/whitespace/link/stale-claim checks passed.
+- [x] Step 8.G: COMPLETE — 2026-08-12 04:21Z; execution 1/2 passed all 25 tests and then stopped on sandbox-only cache denial. Approved identical execution 2/2 passed all 25 tests again, built the allocation-asserting debug VST3/CLAP, and pluginval strictness 5 reported `SUCCESS` across editor, processing, state, automation, parameters, and buses. Optional external VST3 validator remained unconfigured/skipped; non-fatal nice-plug macOS DPI warnings did not fail editor checks.
+- [x] Step 8.F: COMPLETE — 2026-08-12 04:23Z; final attempt 3/3 exited 0 in 1 minute 34 seconds and recreated both GUI-bearing release bundles. No command was run after the automated green stop.
+- [x] Step 9.1: COMPLETE — 2026-08-12 04:53Z; unit-separated numeric entry, concise GUI-only formatting, rounded composite controls, focus/error styling, host-synchronized gestures, and three focused helper tests are present. Compile execution 1/2 and bounded static/diff inspection passed with no dependency, parameter metadata, DSP, identity, or fixed-size change.
+- [x] Step 9.G: COMPLETE — 2026-08-12 04:58Z; approved execution 2/2 passed 28/28 tests, current allocation-asserting VST3/CLAP creation, and pluginval strictness 5 with final `SUCCESS`. Execution 1/2's final segment was isolated to sandboxed GUI-tool startup rather than plug-in behavior.
+- [x] Step 9.F: COMPLETE — 2026-08-12 04:59Z; final attempt 4/4 exited 0 in 12.23 seconds and recreated both refined-GUI release bundles. No automated verification ran after the green stop.
 
 ## Decision Log
 
@@ -584,6 +655,15 @@ With approval for any required user plugin-directory and Resolve changes, run th
 - **Decision:** Do not vendor or patch DeepFilterNet/Tract in this plan.  
   **Rationale:** Worker ownership solves callback allocation and reset reconstruction while staying on official v0.5.6 and avoiding an inference-engine fork.  
   **Date/Author:** 2026-08-11 / Codex main.
+- **Decision:** Use crates.io `nice-plug-egui` 0.3.0 with its matching egui 0.35 line for the custom editor.
+  **Rationale:** It is the maintained adapter in the official nice-plug repository, targets `nice-plug-core` 0.2.0 used by pinned nice-plug 0.2.3, embeds through nice-plug's `Editor` contract, and supplies parameter-aware sliders that emit correct host gestures. A fixed editor needs no extra persistent state or audio/GUI channel.
+  **Date/Author:** 2026-08-12 / Codex main.
+- **Decision:** Implement Phase 9 as two custom composite parameter controls using the already pinned egui stack, with separate numeric buffers and unit labels.
+  **Rationale:** `nice-plug-egui` 0.3.0's stock `ParamSlider` copies the full formatted value, including its unit, into keyboard entry and exposes no formatter hook for only that field. A local composite control can retain `ParamSetter` gesture synchronization while keeping parameter metadata and the dependency/license tree unchanged.
+  **Date/Author:** 2026-08-12 / User and Codex main.
+- **Decision:** Increase Step 8.1's compile-check maximum from two to three executions.
+  **Rationale:** The user explicitly authorized additional verification after execution 1 was consumed by Cargo cache sandbox denial and execution 2 produced a narrow editor API diagnostic that has been corrected. The Step 8.G and final-attempt budgets are unchanged.
+  **Date/Author:** 2026-08-12 / User and Codex main.
 - **Decision:** Increase only Step 3.2's verification maximum from two to three executions.
   **Rationale:** The user explicitly approved one additional identical execution because the first attempt was consumed solely by a frequent sandbox denial; the second reached compilation and produced the now-repaired type diagnostic. All other step and final budgets remain unchanged.
   **Date/Author:** 2026-08-11 / User and Codex main.
@@ -618,14 +698,20 @@ With approval for any required user plugin-directory and Resolve changes, run th
 - pluginval strictness 5 passed the allocation-asserting VST3 and exercised 44.1/48/96 kHz block sizes and automation. Its separate optional Steinberg `vst3 validator` subtest reported that no validator path was configured and was skipped; this did not fail the declared pluginval command.
 - The pinned v0.5.6 repository contains both embedded DeepFilterNet3 ONNX archives under `models/`, while neither archive contains a license, copying, or notice file of its own. Repository-level MIT/Apache files are present; the third-party notice reports only those observable facts.
 - The final release build succeeds with eight warnings confined to private visibility bounds/interfaces and test/status helper dead code. They do not prevent bundle creation and cannot be changed after the green stop without invalidating final/manual evidence.
-- The README screenshot was captured in Audacity and shows Audacity's host-generated parameter interface. The plug-in does not override nice-plug's `Plugin::editor()` default, so no custom editor is supplied and DaVinci Resolve 21 may show no plug-in window.
+- The README screenshot was captured in Audacity and shows Audacity's host-generated parameter interface. That observation described the pre-Phase-8 implementation; the current plugin overrides `Plugin::editor()` with the compact custom editor.
 - The user confirmed one successful DaVinci Resolve 21 Deliver export. This is partial host evidence only because the predeclared sample-rate, repeatability, interaction, latency, and artifact measurements were not recorded.
+- nice-plug 0.2.3 resolves `nice-plug-core` 0.2.0. The official repository's current `nice-plug-egui` 0.3.0 targets that same core API and egui 0.35.0, and its `ParamSlider` sends `ParamSetter` begin/set/end gestures while reading host-updated atomic parameter values directly.
+- Step 8.G execution 1/2 proved all 25 tests pass, but nested Cargo metadata attempted to unpack an Apple-target dependency into the shared registry and was denied by the sandbox before the debug bundle or pluginval stage. The identical retry needs Cargo cache-write approval.
+- Step 8.G execution 2/2 passed. pluginval successfully opened the egui editor cold/warm, idle, during processing, and while automating parameters. nice-plug logged non-fatal warnings when pluginval requested an explicit macOS DPI scale; macOS uses system scale through the adapter and the editor checks completed.
+- `nice-plug-egui` 0.3.0's stock `ParamSlider` seeds keyboard entry with `param.to_string()`, so the parameter unit is included in the editable buffer and there is no public formatter hook for only that field. Phase 9 therefore uses local composite controls while preserving the same `ParamSetter` gesture contract.
+- Step 9.G execution 1/2 reached the pluginval segment only after all tests and bundle creation passed, then sandboxed pluginval aborted with exit 134 and no output. Standalone `pluginval --help` reproduced the same abort without loading a plug-in; approved execution 2/2 outside the sandbox ended with `SUCCESS`.
 
 ## Official Source Record
 
 - nice-plug repository/API/license: <https://codeberg.org/RustAudio/nice-plug>; inspected main SHA `7df33d3c7471b1c89db65072cf2556d9d25a4737`, crates `nice-plug 0.2.3`, `nice-plug-xtask 0.1.1`, ISC.
 - nice-plug lifecycle and latency: <https://codeberg.org/RustAudio/nice-plug/src/branch/main/crates/nice-plug-core/src/plugin.rs>, <https://codeberg.org/RustAudio/nice-plug/src/branch/main/crates/nice-plug-core/src/context/init.rs>.
 - nice-plug STFT/latency and allocation examples: <https://codeberg.org/RustAudio/nice-plug/src/branch/main/examples/stft/src/lib.rs>, <https://codeberg.org/RustAudio/nice-plug/src/branch/main/crates/nice-plug/Cargo.toml>.
+- nice-plug egui adapter and parameter-slider example: <https://codeberg.org/RustAudio/nice-plug/src/branch/main/crates/nice-plug-egui>, <https://codeberg.org/RustAudio/nice-plug/src/branch/main/examples/gain_egui/src/lib.rs>; inspected main SHA `7df33d3c7471b1c89db65072cf2556d9d25a4737`, `nice-plug-egui` 0.3.0 targeting `nice-plug-core` 0.2.0 and egui 0.35.0.
 - DeepFilterNet v0.5.6 crate/features/model/reset/process: <https://github.com/Rikorose/DeepFilterNet/blob/978576aa8400552a4ce9730838c635aa30db5e61/libDF/Cargo.toml>, <https://github.com/Rikorose/DeepFilterNet/blob/978576aa8400552a4ce9730838c635aa30db5e61/libDF/src/tract.rs>.
 - Official latency formula: <https://github.com/Rikorose/DeepFilterNet/blob/978576aa8400552a4ce9730838c635aa30db5e61/libDF/src/bin/enhance_wav.rs>.
 - Official LADSPA behavior/reference: <https://github.com/Rikorose/DeepFilterNet/blob/978576aa8400552a4ce9730838c635aa30db5e61/ladspa/src/lib.rs>, <https://github.com/Rikorose/DeepFilterNet/blob/978576aa8400552a4ce9730838c635aa30db5e61/ladspa/README.md>.
@@ -636,9 +722,9 @@ With approval for any required user plugin-directory and Resolve changes, run th
 
 ## Outcomes & Retrospective
 
-- Automated implementation and release acceptance are complete. The default locked bundle uses nice-plug and official DeepFilterNet v0.5.6 LL only; the standard model remains an explicit alternate build feature.
+- Automated implementation and release acceptance are complete for the authorized refined custom-editor change. The default locked bundle uses nice-plug and official DeepFilterNet v0.5.6 LL only; the standard model remains an explicit alternate build feature.
 - Verified reported/measured latency is 1764 samples at 44.1 kHz, 1440 at 48 kHz, and 3840 at 96 kHz. Tests and pluginval cover mapping, reset, aligned fallback, allocation assertions, non-48 kHz conversion, and shared real-time/offline DSP.
-- Final release artifacts were recreated at `target/bundled/deepfilter-vst.vst3` and `target/bundled/deepfilter-vst.clap` on final attempt 2/3 after the MIT manifest change. Hash and direct bundle-architecture record remain part of the approved manual-host evidence because the automated green stop is active.
-- The current MIT Apple Silicon distribution candidate is `dist/DeepFilterNR-v0.5.0-macos-arm64.zip` with SHA-256 sidecar and accepted hash `b50c4e97073743cc91c905a04e9c349de4bd96fc181f8f3d3dcae34d4fb43204`. Its license prose is reduced to required notices and the unresolved model warning. It was prepared locally only; publishing remains deferred pending upstream model-weight licensing clarification.
-- DaVinci Resolve 21 has one user-confirmed successful Deliver export with the plug-in applied. The plug-in has no custom editor; the README image is Audacity's generated parameter interface, and Resolve 21 may display no plug-in window.
-- Remaining completion condition: SC-11 remains open because its full repeatability, interaction, latency, and multi-rate evidence was not captured by the user-reported Resolve 21 export.
+- Final refined-GUI release artifacts were recreated at `target/bundled/deepfilter-vst.vst3` and `target/bundled/deepfilter-vst.clap` on final attempt 4/4. The fixed 420 × 190 editor keeps only Attenuation Limit and Mix, presents concise unit-separated numeric entry, and preserves host automation gestures and parameter metadata. The automated green stop is active.
+- The prior MIT Apple Silicon distribution candidate is `dist/DeepFilterNR-v0.5.0-macos-arm64.zip` with historical accepted hash `b50c4e97073743cc91c905a04e9c349de4bd96fc181f8f3d3dcae34d4fb43204`. It predates the GUI, is now superseded, and will not be regenerated or published in Phase 8.
+- DaVinci Resolve 21 has one user-confirmed successful Deliver export with the plug-in applied. That evidence and the README's Audacity-generated image predate the custom editor.
+- Remaining completion condition: SC-11 separately remains open because its full repeatability, interaction, latency, and multi-rate evidence was not captured by the user-reported Resolve 21 export, and that partial evidence predates the GUI artifact.

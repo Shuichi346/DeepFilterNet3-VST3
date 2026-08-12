@@ -6,6 +6,7 @@ compile_error!("exactly one DeepFilterNet model feature must be enabled");
 
 mod bridge;
 mod dsp;
+mod editor;
 mod model;
 mod params;
 mod resampler;
@@ -26,6 +27,7 @@ enum ProcessingState {
 
 struct DeepFilterPlugin {
     params: Arc<DeepFilterParams>,
+    editor_state: Arc<nice_plug_egui::EguiState>,
     processing: ProcessingState,
 }
 
@@ -33,6 +35,7 @@ impl Default for DeepFilterPlugin {
     fn default() -> Self {
         Self {
             params: Arc::new(DeepFilterParams::default()),
+            editor_state: editor::default_state(),
             processing: ProcessingState::Bypass,
         }
     }
@@ -66,6 +69,10 @@ impl Plugin for DeepFilterPlugin {
 
     fn params(&self) -> Arc<dyn Params> {
         self.params.clone()
+    }
+
+    fn editor(&mut self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
+        editor::create(self.params.clone(), self.editor_state.clone())
     }
 
     fn initialize(
@@ -376,5 +383,17 @@ mod tests {
             max_buffer_size: u32::MAX,
             process_mode: ProcessMode::Realtime,
         });
+    }
+
+    #[test]
+    fn custom_editor_is_fixed_and_compact() {
+        let mut plugin = DeepFilterPlugin::default();
+        let executor = AsyncExecutor::new(Arc::new(|_| {}), Arc::new(|_| {}));
+        let editor = plugin.editor(executor).expect("custom editor should exist");
+        let size = editor.size().to_logical::<f32>(1.0);
+
+        assert_eq!(size.width, editor::EDITOR_WIDTH);
+        assert_eq!(size.height, editor::EDITOR_HEIGHT);
+        assert!(!editor.resize_hint().can_resize);
     }
 }

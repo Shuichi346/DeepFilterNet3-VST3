@@ -33,6 +33,15 @@ Project instructions for coding agents working in this repository.
   Unsupported rates, invalid layouts, queue limits, or startup failures must
   initialize as unchanged direct bypass with zero reported latency.
 
+## Editor invariant
+
+- Keep the custom editor fixed-size and English-only with exactly two
+  interactive controls: the existing `atten_lim` and `mix` parameter sliders.
+  Do not add model selection, waveforms, meters, bypass, presets, or other
+  controls unless the user explicitly expands the UI scope.
+- Keep GUI work outside the audio callback and route slider gestures through
+  nice-plug's parameter setter so host automation remains synchronized.
+
 ## Release packaging
 
 - Keep the project license as MIT in `plugin/Cargo.toml` and root `LICENSE`.
@@ -40,8 +49,9 @@ Project instructions for coding agents working in this repository.
   third-party terms, not alternative project licenses.
 - Keep license documentation concise: do not restore dependency-purpose prose
   or license-expression tables. Preserve the embedded-model redistribution
-  warning, required MIT/ISC notices, canonical Apache-2.0 and Unicode texts,
-  and the exact VST trademark attribution in repository and package output.
+  warning, required MIT/ISC/font notices, canonical Apache-2.0, Unicode, and
+  embedded-font texts, and the exact VST trademark attribution in repository
+  and package output.
 - After a successful release bundle build, create the Apple Silicon archive
   only with `./scripts/package-release.sh`. The script must keep verifying thin
   arm64 binaries, valid ad-hoc signatures, ZIP integrity, and SHA-256 output;

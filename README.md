@@ -13,9 +13,12 @@ DeepFilterNet3 VST3 is a macOS audio plugin that embeds the official DeepFilterN
 
 ## Preview
 
-<img src="githubreadme/screensho.png" alt="Audacity host-generated parameter window for DeepFilter Noise Reduction" width="480">
+<img src="githubreadme/screensho.png" alt="Historical Audacity host-generated parameter window for DeepFilter Noise Reduction" width="480">
 
-Shown in Audacity. This is Audacity's host-generated parameter interface, not a custom editor supplied by the plug-in. Other hosts may present the parameters differently or provide no plug-in window.
+Shown in Audacity. This historical screenshot is Audacity's host-generated
+parameter interface. Current builds also supply a compact custom editor with
+the same **Attenuation Limit** and **Mix** controls; no other controls or
+visualizations are included.
 
 ## Audio demo
 
@@ -54,6 +57,7 @@ The plug-in bypassed and enabled:
 - Reported latency with sample-aligned dry/wet mixing.
 - The same DSP, resamplers, timeline, and reset protocol in Realtime, Buffered, and Offline modes.
 - Lock-free callback transport and a latency-aligned dry fallback when a worker result is late.
+- Compact English custom editor with only Attenuation Limit and Mix sliders.
 - VST3 and CLAP exports with stable plugin and parameter IDs.
 
 ## Tech stack
@@ -62,15 +66,25 @@ The plug-in bypassed and enabled:
 | :--- | :--- |
 | Rust 2021 workspace | Plugin, DSP bridge, tests, and bundle task |
 | [nice-plug 0.2.3](https://codeberg.org/RustAudio/nice-plug) | VST3/CLAP framework and exports |
+| [nice-plug-egui 0.3.0](https://codeberg.org/RustAudio/nice-plug/src/branch/main/crates/nice-plug-egui) / [egui 0.35.0](https://github.com/emilk/egui/tree/0.35.0) | Embedded two-slider custom editor |
 | [DeepFilterNet 0.5.6](https://github.com/Rikorose/DeepFilterNet/tree/v0.5.6) | Official embedded model and Tract inference |
 | [rubato 0.14.1](https://github.com/HEnquist/rubato/tree/v0.14.1) | Persistent fixed-size sample-rate conversion |
 | [rtrb 0.3.3](https://github.com/mgeier/rtrb/tree/v0.3.3) | Lock-free worker queues |
 
 ## Current validation scope
 
-The current implementation is built and tested on Apple Silicon with macOS 26. Automated validation includes 24 Rust tests and pluginval strictness 5 with callback allocation assertions. pluginval exercised 44.1, 48, and 96 kHz processing and automation and completed with `SUCCESS`.
+The current implementation is built and tested on Apple Silicon with macOS
+26. Automated validation includes 25 Rust tests and pluginval strictness 5
+with callback allocation assertions. pluginval opened the custom editor both
+idle and during processing, exercised editor automation plus 44.1, 48, and 96
+kHz processing, and completed with `SUCCESS`.
 
-A user-confirmed test in DaVinci Resolve 21 completed a successful Deliver export with the plug-in applied. Resolve 21 did not display a plug-in UI, which is expected because this plug-in does not provide a custom editor. The broader repeatability, interaction, latency, and multi-rate Resolve smoke-test matrix has not yet been completed. Windows, Linux, and Intel macOS builds have not been validated.
+A user-confirmed test in DaVinci Resolve 21 completed a successful Deliver
+export with an earlier bundle. That bundle predated the custom editor, so the
+result is not UI validation for the current build. The broader repeatability,
+interaction, latency, and multi-rate Resolve smoke-test matrix has not yet
+been completed. Windows, Linux, and Intel macOS builds have not been
+validated.
 
 ## Audio behavior
 
@@ -152,12 +166,15 @@ Restart or rescan the host after installation. Local builds are not distributed 
 
 1. Build and install the VST3 or CLAP bundle, then restart or rescan the host.
 2. Add **DeepFilter Noise Reduction** to a mono or stereo audio track.
-3. Leave **Mix** at 100% for the fully enhanced signal, or reduce it to blend in the latency-aligned dry channel.
-4. Adjust **Attenuation Limit** to cap the amount of noise attenuation. A 0 dB setting selects aligned raw audio while keeping model state advancing.
+3. Open the plug-in editor. It contains only **Attenuation Limit** and **Mix** sliders.
+4. Leave **Mix** at 100% for the fully enhanced signal, or reduce it to blend in the latency-aligned dry channel.
+5. Adjust **Attenuation Limit** to cap the amount of noise attenuation. A 0 dB setting selects aligned raw audio while keeping model state advancing.
 
 The host receives the plugin's calculated latency during initialization. If the requested host configuration is unsupported, the plugin remains available but passes audio through unchanged and reports zero latency.
 
-The plug-in exposes host parameters but does not provide a custom editor. Parameter controls therefore depend on the host: the preview above is Audacity's generated interface, while DaVinci Resolve 21 may not display a plug-in window.
+The compact custom editor and host-generated parameter panels both control the
+same two automatable parameters. Host automation and external parameter
+changes remain synchronized with the sliders.
 
 ## Parameters
 
@@ -215,6 +232,7 @@ script does not install or publish anything.
 ```text
 plugin/src/lib.rs        Plugin metadata, lifecycle, host layouts, and exports
 plugin/src/params.rs     Attenuation Limit and Mix parameters
+plugin/src/editor.rs     Fixed-size English two-slider custom editor
 plugin/src/bridge.rs     Callback-side buffering, alignment, and fallback
 plugin/src/dsp.rs        Worker DSP core and latency calculation
 plugin/src/model.rs      DeepFilterNet model wrapper and metadata
@@ -245,7 +263,7 @@ Confirm that the VST3 or CLAP directory matches the installation paths above, th
 - Worker/model startup is bounded to ten seconds; a startup failure selects direct bypass.
 - Unsupported rate or buffer configurations select direct bypass rather than resampling approximately.
 - A successful Deliver export has been user-confirmed in DaVinci Resolve 21, but the full repeatability, interaction, latency, and multi-rate host matrix remains unverified.
-- The plug-in has no custom editor; parameter presentation depends on the host, and DaVinci Resolve 21 may show no plug-in UI.
+- The README screenshot shows an older Audacity-generated parameter panel, not the current custom editor.
 - Only the Apple Silicon macOS configuration described above has been validated.
 
 ## License
