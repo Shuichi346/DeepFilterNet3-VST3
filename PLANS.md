@@ -10,12 +10,12 @@ The real-time audio callback will not run `DfTract` directly because v0.5.6's Tr
 
 ## Resume Here
 
-- Updated: 2026-08-12 04:59Z
+- Updated: 2026-08-12 05:10Z
 - Overall status: COMPLETE — refined two-slider editor and release bundles
 - Active phase: Phase 9 complete
 - Active step: None
 - Last verified checkpoint: Final Acceptance PASS on attempt 4/4; exact refined-GUI release bundle command exited 0.
-- Completed since previous checkpoint: The user supplied focused/unfocused screenshots, approved implementation after a pre-code feasibility report, and confirmed that no additional GUI dependency is needed. Local `nice-plug-egui` 0.3.0 source shows its stock `ParamSlider` initializes keyboard entry from the complete parameter display string, including the unit.
+- Completed since previous checkpoint: The user confirmed the refined editor appearance and supplied a current screenshot. `githubreadme/screensho.png` now contains that exact image, both README previews describe the current custom editor, and the obsolete Audacity screenshot limitation was removed. The README image remains repository-only and excluded from release packages, so final binary evidence is unchanged.
 - In progress: None. The final VST3 and CLAP bundles contain the refined fixed 420 × 190 editor with two composite parameter controls and unit-separated numeric entry.
 - Next action: Optional manual host inspection of the final refined-GUI bundle requires approval for any plug-in-directory or Resolve mutation. The full SC-11 Resolve matrix remains separately open.
 - Blockers / decisions needed: None for implementation. Upstream DeepFilterNet issue #697 still leaves pretrained-model redistribution terms unconfirmed, so no package may be described as legally cleared or uploaded by Codex.
@@ -698,7 +698,7 @@ With approval for any required user plugin-directory and Resolve changes, run th
 - pluginval strictness 5 passed the allocation-asserting VST3 and exercised 44.1/48/96 kHz block sizes and automation. Its separate optional Steinberg `vst3 validator` subtest reported that no validator path was configured and was skipped; this did not fail the declared pluginval command.
 - The pinned v0.5.6 repository contains both embedded DeepFilterNet3 ONNX archives under `models/`, while neither archive contains a license, copying, or notice file of its own. Repository-level MIT/Apache files are present; the third-party notice reports only those observable facts.
 - The final release build succeeds with eight warnings confined to private visibility bounds/interfaces and test/status helper dead code. They do not prevent bundle creation and cannot be changed after the green stop without invalidating final/manual evidence.
-- The README screenshot was captured in Audacity and shows Audacity's host-generated parameter interface. That observation described the pre-Phase-8 implementation; the current plugin overrides `Plugin::editor()` with the compact custom editor.
+- The previous README screenshot was captured in Audacity and showed Audacity's host-generated parameter interface. That historical observation described the pre-Phase-8 implementation; the asset was replaced after Phase 9 with the user-supplied refined custom-editor screenshot.
 - The user confirmed one successful DaVinci Resolve 21 Deliver export. This is partial host evidence only because the predeclared sample-rate, repeatability, interaction, latency, and artifact measurements were not recorded.
 - nice-plug 0.2.3 resolves `nice-plug-core` 0.2.0. The official repository's current `nice-plug-egui` 0.3.0 targets that same core API and egui 0.35.0, and its `ParamSlider` sends `ParamSetter` begin/set/end gestures while reading host-updated atomic parameter values directly.
 - Step 8.G execution 1/2 proved all 25 tests pass, but nested Cargo metadata attempted to unpack an Apple-target dependency into the shared registry and was denied by the sandbox before the debug bundle or pluginval stage. The identical retry needs Cargo cache-write approval.
@@ -726,5 +726,5 @@ With approval for any required user plugin-directory and Resolve changes, run th
 - Verified reported/measured latency is 1764 samples at 44.1 kHz, 1440 at 48 kHz, and 3840 at 96 kHz. Tests and pluginval cover mapping, reset, aligned fallback, allocation assertions, non-48 kHz conversion, and shared real-time/offline DSP.
 - Final refined-GUI release artifacts were recreated at `target/bundled/deepfilter-vst.vst3` and `target/bundled/deepfilter-vst.clap` on final attempt 4/4. The fixed 420 × 190 editor keeps only Attenuation Limit and Mix, presents concise unit-separated numeric entry, and preserves host automation gestures and parameter metadata. The automated green stop is active.
 - The prior MIT Apple Silicon distribution candidate is `dist/DeepFilterNR-v0.5.0-macos-arm64.zip` with historical accepted hash `b50c4e97073743cc91c905a04e9c349de4bd96fc181f8f3d3dcae34d4fb43204`. It predates the GUI, is now superseded, and will not be regenerated or published in Phase 8.
-- DaVinci Resolve 21 has one user-confirmed successful Deliver export with the plug-in applied. That evidence and the README's Audacity-generated image predate the custom editor.
+- DaVinci Resolve 21 has one user-confirmed successful Deliver export with the plug-in applied. That host evidence predates the custom editor; the README image now shows the current refined editor and is not host-validation evidence.
 - Remaining completion condition: SC-11 separately remains open because its full repeatability, interaction, latency, and multi-rate evidence was not captured by the user-reported Resolve 21 export, and that partial evidence predates the GUI artifact.

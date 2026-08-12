@@ -13,12 +13,11 @@ DeepFilterNet3 VST3 is a macOS audio plugin that embeds the official DeepFilterN
 
 ## Preview
 
-<img src="githubreadme/screensho.png" alt="Historical Audacity host-generated parameter window for DeepFilter Noise Reduction" width="480">
+<img src="githubreadme/screensho.png" alt="DeepFilter Noise Reduction custom editor with Attenuation Limit and Mix controls" width="480">
 
-Shown in Audacity. This historical screenshot is Audacity's host-generated
-parameter interface. Current builds also supply a compact custom editor with
-the same **Attenuation Limit** and **Mix** controls; no other controls or
-visualizations are included.
+The compact custom editor provides **Attenuation Limit** and **Mix** controls
+with unit-separated numeric entry. No other controls or visualizations are
+included.
 
 ## Audio demo
 
@@ -263,7 +262,6 @@ Confirm that the VST3 or CLAP directory matches the installation paths above, th
 - Worker/model startup is bounded to ten seconds; a startup failure selects direct bypass.
 - Unsupported rate or buffer configurations select direct bypass rather than resampling approximately.
 - A successful Deliver export has been user-confirmed in DaVinci Resolve 21, but the full repeatability, interaction, latency, and multi-rate host matrix remains unverified.
-- The README screenshot shows an older Audacity-generated parameter panel, not the current custom editor.
 - Only the Apple Silicon macOS configuration described above has been validated.
 
 ## License

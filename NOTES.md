@@ -19,8 +19,8 @@
 - The user confirmed that DaVinci Resolve 21 completed a successful Deliver
   export with the plug-in applied.
 - Resolve 21 displayed no plug-in UI for the earlier bundle because that
-  artifact supplied no custom editor. The README screenshot shows Audacity's
-  host-generated parameter interface and predates the new custom editor.
+  artifact supplied no custom editor. The README screenshot now shows the
+  refined custom editor with unit-separated numeric entry.
 - The successful Deliver is partial SC-11 evidence. The sample rate, bundle
   hash, host latency, repeat-render measurements, playback interactions, and
   non-48 kHz case were not recorded, so the full host matrix remains open.
