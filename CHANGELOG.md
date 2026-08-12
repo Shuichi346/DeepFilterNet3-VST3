@@ -17,8 +17,12 @@
   licenses, notices, and SHA-256 checksums.
 - Added a plug-in screenshot and matching effect-off/effect-on WAV demos to
   the repository README. These media assets are excluded from release ZIPs.
+- Added a compact English custom editor containing only Attenuation Limit and
+  Mix sliders, with host-aware parameter gestures for automation.
 - Added the required Apache-2.0, MIT, ISC, and Unicode notices, including the
   unresolved upstream pretrained-model redistribution clarification.
+- Added the required embedded GUI font notices and license texts to the
+  repository and release-package inventory.
 
 ### Changed
 

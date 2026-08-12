@@ -2,13 +2,25 @@
 
 ## 2026-08-12
 
+- The plug-in now defines a fixed 420 × 190 logical-pixel custom editor using
+  nice-plug-egui 0.3.0 and egui 0.35.0. Its only controls are English
+  Attenuation Limit and Mix parameter sliders.
+- The custom editor uses nice-plug's parameter-aware slider gestures and does
+  not add an audio-to-GUI channel, model selector, waveform, or meter.
+- The GUI dependency embeds default fonts, so the repository and packaging
+  inventory now retain their upstream font notices and license texts.
+- All 25 library tests passed after the editor addition. pluginval strictness
+  5 opened the editor idle and during processing, exercised editor automation
+  and the existing multi-rate DSP matrix, and reported `SUCCESS`.
+- pluginval emitted non-fatal nice-plug warnings when it requested an explicit
+  macOS DPI scale; nice-plug used system scaling and the editor tests passed.
 - The current manual-validation target is DaVinci Resolve 21; Resolve 20 is an
   older version retained only in the original requirements history.
 - The user confirmed that DaVinci Resolve 21 completed a successful Deliver
   export with the plug-in applied.
-- Resolve 21 displayed no plug-in UI. This is expected because the plug-in
-  exposes host parameters but supplies no custom editor. The README screenshot
-  shows Audacity's host-generated parameter interface.
+- Resolve 21 displayed no plug-in UI for the earlier bundle because that
+  artifact supplied no custom editor. The README screenshot now shows the
+  refined custom editor with unit-separated numeric entry.
 - The successful Deliver is partial SC-11 evidence. The sample rate, bundle
   hash, host latency, repeat-render measurements, playback interactions, and
   non-48 kHz case were not recorded, so the full host matrix remains open.

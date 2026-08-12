@@ -6,21 +6,34 @@ The default binary embeds `DeepFilterNet3_ll_onnx.tar.gz` from DeepFilterNet
 v0.5.6. That archive and its directory contain no separate model-weight
 license. This notice does not grant or confirm model redistribution rights.
 
+## Embedded GUI fonts
+
+The custom editor embeds Hack Regular, Noto Emoji, Ubuntu Light, and Emoji
+Icon Font through `epaint_default_fonts` 0.35.0. Their required MIT, Bitstream
+Vera, SIL Open Font License 1.1, and Ubuntu Font Licence 1.0 notices are in
+`third-party-licenses/Embedded-Font-Licenses.txt`.
+
 ## Apache License 2.0
 
 Apache-2.0 applies to the Rust components in the default binary that offer
-that license, including DeepFilterNet source code, `rtrb`, `ndarray`, and
-`vst3`. See the accompanying `Apache-2.0.txt`.
+that license, including DeepFilterNet source code, `rtrb`, `ndarray`, `vst3`,
+egui, egui-baseview, and their eligible dependencies. See the accompanying
+`Apache-2.0.txt`.
 
 ## MIT notices
 
 The default binary also contains MIT-licensed code from these components:
 
 - `bytes` 1.12.1 — Copyright (c) 2018 Carl Lerche
+- `block2` 0.5.1 and 0.6.2 — Mads Marquart
 - `crunchy` 0.2.4 — Copyright 2017-2023 Eira Fransham
 - `dpi` 0.1.2 and `libm` 0.2.16
+- `harfrust` 0.7.0 — HarfBuzz developers; Copyright (c) 2020 Yevhenii Reizner
+- `memoffset` 0.9.1 — Copyright (c) 2017 Gilad Naaman
 - `nom` 7.1.3 — Copyright (c) 2014-2019 Geoffroy Couprie
-- `objc2` 0.6.4 and `objc2-encode` 4.1.0 — Mads Marquart
+- `objc2` 0.5.2/0.6.4, `objc2-encode` 4.1.0, `objc-sys` 0.3.5, and the
+  included `objc2` framework crates — Mads Marquart
+- `open` 5.4.1 — Copyright (c) 2015 Sebastian Thiel
 - `ordered-multimap` 0.6.0 — Copyright (c) 2018 sgodwincs
 - `realfft` 3.5.0 and `rubato` 0.14.1 — Copyright (c) 2020 Henrik Enquist
 - `rust-ini` 0.19.0 — Copyright (c) 2014 Y. T. CHUNG
@@ -51,7 +64,8 @@ SOFTWARE.
 
 ## ISC notices
 
-The default binary contains `nice-plug` and `nice-plug-core`:
+The default binary contains `nice-plug`, `nice-plug-core`, and
+`nice-plug-egui`:
 
 Copyright (c) 2022-2024 Robbert van der Helm
 
