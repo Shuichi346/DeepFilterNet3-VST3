@@ -66,7 +66,7 @@ DeepFilterNet3 VST3 は、公式 DeepFilterNet v0.5.6 モデルを組み込ん�
 | [nice-plug-egui 0.3.0](https://codeberg.org/RustAudio/nice-plug/src/branch/main/crates/nice-plug-egui) / [egui 0.35.0](https://github.com/emilk/egui/tree/0.35.0) | 2スライダー埋め込みカスタムエディター |
 | [DeepFilterNet 0.5.6](https://github.com/Rikorose/DeepFilterNet/tree/v0.5.6) | 公式組み込みモデルおよび Tract 推論 |
 | [rubato 0.14.1](https://github.com/HEnquist/rubato/tree/v0.14.1) | 固定サイズ永続サンプルレート変換 |
-| [rtrb 0.3.3](https://github.com/mgeier/rtrb/tree/v0.3.3) | ロックフリーワーカーキュー |
+| [rtrb 0.3.3](https://github.com/mgeier/rtrb/tree/0.3.3) | ロックフリーワーカーキュー |
 
 ## 現在の検証スコープ
 
