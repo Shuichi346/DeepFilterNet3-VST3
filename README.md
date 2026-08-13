@@ -68,7 +68,7 @@ The plug-in bypassed and enabled:
 | [nice-plug-egui 0.3.0](https://codeberg.org/RustAudio/nice-plug/src/branch/main/crates/nice-plug-egui) / [egui 0.35.0](https://github.com/emilk/egui/tree/0.35.0) | Embedded two-slider custom editor |
 | [DeepFilterNet 0.5.6](https://github.com/Rikorose/DeepFilterNet/tree/v0.5.6) | Official embedded model and Tract inference |
 | [rubato 0.14.1](https://github.com/HEnquist/rubato/tree/v0.14.1) | Persistent fixed-size sample-rate conversion |
-| [rtrb 0.3.3](https://github.com/mgeier/rtrb/tree/v0.3.3) | Lock-free worker queues |
+| [rtrb 0.3.3](https://github.com/mgeier/rtrb/tree/0.3.3) | Lock-free worker queues |
 
 ## Current validation scope
 
