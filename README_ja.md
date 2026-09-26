@@ -207,14 +207,14 @@ cargo xtask bundle deepfilter-vst --release
 このスクリプトは `plugin/Cargo.toml` からバージョンを読み取ります。明示的にバージョンを指定することもできます:
 
 ```bash
-./scripts/package-release.sh 0.5.0
+./scripts/package-release.sh 0.7.0
 ```
 
 スクリプトは両バンドルが有効なアドホック署名を持つスリムな arm64 バイナリであることを検証し、以下を作成します:
 
 ```text
-dist/DeepFilterNR-v0.5.0-macos-arm64.zip
-dist/DeepFilterNR-v0.5.0-macos-arm64.zip.sha256
+dist/DeepFilterNR-v0.7.0-macos-arm64.zip
+dist/DeepFilterNR-v0.7.0-macos-arm64.zip.sha256
 ```
 
 ZIP ファイルには両方のプラグインバンドル、インストール手順、必要なライセンス通知、チェックサムが含まれています。既存のパッケージは上書きされません。スクリプトはインストールや公開は行いません。

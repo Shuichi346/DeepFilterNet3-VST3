@@ -2,6 +2,13 @@
 
 ## 2026-09-26
 
+- Updated the plugin from 0.6.0 to 0.7.0, rebuilt both formats, and confirmed
+  the actual exported plugin descriptor reports 0.7.0. The bundler's generic
+  Info.plist version is independent of the host-facing plugin VERSION.
+- Created the verified v0.7.0 ZIP and checksum sidecar, and installed its VST3
+  with the previous installed bundle preserved in `dist/installed-backup-before-v070/`.
+  DSP and dependencies were unchanged, so the existing behavioral evidence was reused.
+
 - Plan maintenance removed duplicate trackers, superseded instructions, and
   repeated acceptance gates. `PLANS.md` retained current design and acceptance
   evidence; historical construction details remained in Git and these notes.

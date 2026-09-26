@@ -26,6 +26,8 @@
 
 ### Changed
 
+- Updated the plug-in version from 0.6.0 to 0.7.0.
+
 - Consolidated implementation tracking in `PLANS.md` and replaced repeated
   verification gates with checks scoped to the affected behavior and artifacts.
 - Changed the project and plug-in release version to 0.5.0.

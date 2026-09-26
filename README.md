@@ -218,14 +218,14 @@ cargo xtask bundle deepfilter-vst --release
 The script reads the version from `plugin/Cargo.toml`. You can also pass an explicit version:
 
 ```bash
-./scripts/package-release.sh 0.5.0
+./scripts/package-release.sh 0.7.0
 ```
 
 It verifies that both bundles are thin arm64 binaries with valid ad-hoc signatures, then creates:
 
 ```text
-dist/DeepFilterNR-v0.5.0-macos-arm64.zip
-dist/DeepFilterNR-v0.5.0-macos-arm64.zip.sha256
+dist/DeepFilterNR-v0.7.0-macos-arm64.zip
+dist/DeepFilterNR-v0.7.0-macos-arm64.zip.sha256
 ```
 
 The ZIP contains both plug-in bundles, installation instructions, required

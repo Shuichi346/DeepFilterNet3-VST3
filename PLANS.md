@@ -14,8 +14,16 @@ This is the sole authoritative checklist. `UPDATE_PLANS.md` remains the original
 - [x] V11: Documentation inspection and `git diff --check` passed; only `PLANS.md` and `AGENTS.md` changed. No source/tests or release artifacts changed.
 - [x] SC-11: Deferred Resolve 21 acceptance on the final artifact; prerequisites and remaining flow below. This is not a prerequisite for plan cleanup or unrelated maintenance.
 
-Current: Complete — plan cleanup. The broader SC-11 host acceptance remains deferred.
-Next: None for cleanup; undertake SC-11 when the host/project and necessary authorization are available.
+- [x] I12: Plugin manifest/lock entry and current README packaging examples now use 0.7.0; dependencies and DSP are unchanged.
+- [x] V12: Release build passed on execution 1 in 6.25 s; exported CLAP descriptor reports 0.7.0 from the shared plugin VERSION constant. Packaging execution 1 passed architecture/signature/ZIP/SHA-256 checks. Existing DSP tests were not repeated for version-only changes.
+- [x] I12.D: Installed the verified v0.7.0 VST3 with matching executable hash; previous installed bundle is preserved at `dist/installed-backup-before-v070/deepfilter-vst.vst3`. No Resolve mutation or publication.
+
+Current: Complete — v0.7.0 version update, packaging, and local VST3 installation.
+Next: None. Running hosts need to reload the plugin or restart.
+
+V12 executable SHA-256: `83e3f1e5abe78e9b893c3b344b5c4836fd8c5e85d69f00a071d92935ba32be9d`.
+Package: `dist/DeepFilterNR-v0.7.0-macos-arm64.zip` and `.zip.sha256`; archive SHA-256: `b79a8aeea40e02e4a7e79c3adb6e78d984bd49e7f30d8c00f33d2f6fa8060095`.
+Version inspection initially expected Cargo's version in Info.plist, but the existing bundler writes 1.0.0 there. The actual host-facing plugin descriptor was then queried directly and confirmed as 0.7.0; no bundler behavior was changed. Earlier artifact hashes below describe historical V10 evidence.
 
 Save this tracker after each implementation step or independent verification unit. Use `[x]` only for evidenced completion. Show the checklist at start, phase boundaries, and completion, with concise changed-item updates otherwise. Reconcile against Git and actual artifacts after interruption; do not restart completed phases.
 
@@ -23,7 +31,7 @@ Save this tracker after each implementation step or independent verification uni
 
 Maintain a native Apple Silicon macOS VST3/CLAP noise-reduction plugin with official DeepFilterNet3-LL inference, continuous mono/stereo processing, aligned dry/wet output, complete reset, and a fixed English two-control editor. Real-time, buffered, and offline rendering share one DSP implementation.
 
-The current request is plan and verification cleanup. It does not reopen completed implementation, require a new release, or authorize installation, host changes, or publication. No product code, test source, dependency, or package changes are needed. Future changes should add dependency-ordered implementation IDs with affected paths, required behavior, and acceptance evidence before work begins.
+The current request is the v0.7.0 version update. Change version metadata and current documentation examples, recreate release artifacts, and refresh the previously authorized local VST3 installation. DSP, dependencies, plugin/parameter identities, and host project state remain unchanged. The new build supersedes the earlier binary hashes; existing behavioral evidence remains applicable.
 
 Preserve these product requirements:
 
