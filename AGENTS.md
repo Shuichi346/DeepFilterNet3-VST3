@@ -9,9 +9,12 @@ Project instructions for coding agents working in this repository.
 - Preserve the plugin name, CLAP ID `com.deepfilter.noise-reduction`, VST3
   class ID `DeepFilterNR001\0`, and parameter IDs `atten_lim` and `mix` unless
   the user explicitly authorizes an identity migration.
-- Respect the verification budgets and green-stop state in `PLANS.md`. A
-  code, manifest, or configuration change invalidates the final release and
-  deferred manual-host evidence; revise the plan before rerunning acceptance.
+- Follow the change-specific verification and retry budgets in `PLANS.md`;
+  stop once affected acceptance passes. Completed historical gates are not
+  prerequisites for unrelated maintenance. Production source, manifest, or
+  build-configuration changes invalidate affected release/manual-host evidence;
+  test-only edits invalidate affected test evidence, while documentation-only
+  edits do not invalidate binaries. Revise the plan before new acceptance work.
 
 ## DSP and build invariants
 

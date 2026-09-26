@@ -26,6 +26,8 @@
 
 ### Changed
 
+- Consolidated implementation tracking in `PLANS.md` and replaced repeated
+  verification gates with checks scoped to the affected behavior and artifacts.
 - Changed the project and plug-in release version to 0.5.0.
 - Migrated the VST3/CLAP plugin and bundler from nih-plug to released
   nice-plug packages while preserving plugin, parameter, CLAP, and VST3

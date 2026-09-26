@@ -2,6 +2,12 @@
 
 ## 2026-09-26
 
+- Plan maintenance removed duplicate trackers, superseded instructions, and
+  repeated acceptance gates. `PLANS.md` retained current design and acceptance
+  evidence; historical construction details remained in Git and these notes.
+- Review retained all 31 Rust tests because they covered distinct failure
+  cases. The cleanup changed documentation only; existing binary evidence
+  remained applicable, so no rebuild or code-test rerun was needed.
 - The operational audit reproduced callback-counted attenuation smoothing,
   dry substitution at 1024/4096-sample callbacks, and latched dry-only output
   after input overflow. Historical pluginval success did not detect these.
