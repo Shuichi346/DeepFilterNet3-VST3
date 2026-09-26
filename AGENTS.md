@@ -26,6 +26,12 @@ Project instructions for coding agents working in this repository.
 - Preserve timestamp and generation matching, per-channel latency-aligned dry
   fallback, and the single shared DSP path for real-time, buffered, and
   offline modes. Only Offline may wait, and its wait must remain bounded.
+- Derive collection runway from the negotiated maximum host block plus one
+  model quantum. Keep it in reported latency and both output timelines;
+  deterministic immediate-worker tests alone do not prove real-time coverage.
+- Advance parameter smoothing in audio-sample time. On input queue overflow,
+  restart the worker generation without resetting host counters or dry delay,
+  and keep aligned dry until the new model/resampler history becomes valid.
 - Continue model advancement at an effectively zero attenuation setting while
   selecting the aligned raw path. Do not use DeepFilterNet's immediate
   zero-attenuation return as host output.

@@ -1,5 +1,34 @@
 # Notes
 
+## 2026-09-26
+
+- The operational audit reproduced callback-counted attenuation smoothing,
+  dry substitution at 1024/4096-sample callbacks, and latched dry-only output
+  after input overflow. Historical pluginval success did not detect these.
+- Attenuation now advances the existing smoother by the callback's sample
+  count. Parameter automation remains block-based; the nominal ramp is 50 ms.
+- Worker runway now covers the negotiated maximum callback rounded up to a
+  quantum, plus one inference quantum. At 48 kHz, maxima of 128/512/1024/4096
+  samples report 1440/1920/2400/5280 samples of total latency respectively.
+- Overflow recovery starts a new generation at the newest complete chunk,
+  preserves absolute host counters and the stereo dry ring, and masks reset
+  model/resampler history with aligned dry until it is valid.
+- All 31 library tests passed, including new parameter-duration, runway, and
+  recovery regressions. At maximum block 1024, measured impulse latency was
+  2646/2400/4800 samples at 44.1/48/96 kHz, with the declared one-sample
+  tolerance for conversion. Release/host evidence is tracked in PLANS.md.
+- Allocation-asserting pluginval strictness 5 completed with SUCCESS. The
+  optimized release probe measured zero dry substitutions at paced 48 kHz
+  blocks of 128/512/1024/4096, a transparent 0 dB path by 100 ms after the
+  change plus reported latency, and enhancement recovery within one second
+  after a forced queue overrun. Enhanced offline speech at 44.1/48/96 kHz
+  remained non-silent and bit-identical after reset. These are bounded host
+  measurements, not a guarantee against arbitrary OS scheduling stalls.
+- The verified release was packaged as `dist/DeepFilterNR-v0.6.0-fix-20260926-macos-arm64.zip`
+  with its SHA-256 sidecar. With separate installation approval, the user VST3
+  was replaced and the previous bundle retained under
+  `dist/installed-backup-20260926/`. Running hosts must reload to use the new binary.
+
 ## 2026-08-12
 
 - The plug-in now defines a fixed 420 × 190 logical-pixel custom editor using

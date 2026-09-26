@@ -31,6 +31,7 @@ impl LatencyBreakdown {
         host_quantum: usize,
         host_to_model_output_delay_model: usize,
         model_to_host_output_delay_host: usize,
+        max_buffer_size: u32,
     ) -> Result<Self, DspError> {
         let model_delay_model = host_to_model_output_delay_model
             .checked_add(model.algorithmic_delay)
@@ -39,8 +40,18 @@ impl LatencyBreakdown {
         let core_delay_host = model_delay_scaled_host
             .checked_add(model_to_host_output_delay_host)
             .ok_or_else(|| DspError::new("host-domain core latency overflowed"))?;
-        let runway_delay_host = host_quantum
-            .checked_mul(2)
+        if host_quantum == 0 || max_buffer_size == 0 {
+            return Err(DspError::new("host quantum and maximum block must be nonzero"));
+        }
+        // A callback can submit and consume a whole block before the worker is
+        // scheduled. Reserve that block plus one inference quantum.
+        let block_quanta = (max_buffer_size as usize)
+            .checked_add(host_quantum - 1)
+            .ok_or_else(|| DspError::new("host block rounding overflowed"))?
+            / host_quantum;
+        let runway_delay_host = block_quanta
+            .checked_add(1)
+            .and_then(|quanta| quanta.checked_mul(host_quantum))
             .ok_or_else(|| DspError::new("host runway latency overflowed"))?;
         let total_host = core_delay_host
             .checked_add(runway_delay_host)
@@ -81,7 +92,11 @@ pub(crate) struct DspCore {
 
 impl DspCore {
     /// Construct all model-rate and host-rate state inside the worker thread.
-    pub(crate) fn new(engine: DfEngine, host_sample_rate: usize) -> Result<Self, DspError> {
+    pub(crate) fn new(
+        engine: DfEngine,
+        host_sample_rate: usize,
+        max_buffer_size: u32,
+    ) -> Result<Self, DspError> {
         let plan = RatePlan::preflight(host_sample_rate).map_err(DspError::from_rate)?;
         let model = engine.info();
         plan.verify_model(model).map_err(DspError::from_rate)?;
@@ -102,6 +117,7 @@ impl DspCore {
             plan.host_quantum,
             host_to_model.output_delay(),
             model_to_host.output_delay(),
+            max_buffer_size,
         )?;
         let raw_delay_len = model.algorithmic_delay;
         let info = DspInfo {
@@ -273,6 +289,7 @@ mod tests {
                 host_quantum,
                 host_to_model_delay,
                 model_to_host_delay,
+                host_quantum as u32,
             )
             .expect("checked latency case must construct");
             assert_eq!(
@@ -300,8 +317,24 @@ mod tests {
     fn latency_construction_rejects_overflow() {
         let mut model = ll_model();
         model.algorithmic_delay = usize::MAX;
-        assert!(LatencyBreakdown::new(model, 48_000, 480, 1, 0).is_err());
-        assert!(LatencyBreakdown::new(ll_model(), 48_000, usize::MAX, 0, 0).is_err());
+        assert!(LatencyBreakdown::new(model, 48_000, 480, 1, 0, 512).is_err());
+        assert!(LatencyBreakdown::new(ll_model(), 48_000, usize::MAX, 0, 0, 512).is_err());
+        assert!(LatencyBreakdown::new(ll_model(), 48_000, 0, 0, 0, 512).is_err());
+        assert!(LatencyBreakdown::new(ll_model(), 48_000, 480, 0, 0, 0).is_err());
+    }
+
+    #[test]
+    fn runway_covers_the_largest_callback_and_an_inference_quantum() {
+        for (block, runway, total) in [
+            (128, 960, 1440), (480, 960, 1440), (512, 1440, 1920),
+            (1024, 1920, 2400), (4096, 4800, 5280),
+        ] {
+            let latency = LatencyBreakdown::new(ll_model(), 48_000, 480, 0, 0, block)
+                .expect("supported callback must fit");
+            assert_eq!(latency.runway_delay_host, runway);
+            assert_eq!(latency.total_host, total);
+            assert!(latency.runway_delay_host >= block as usize + 480);
+        }
     }
 
     #[cfg(feature = "model-ll")]
@@ -337,7 +370,7 @@ mod tests {
     fn real_core_reset_after_nonzero_audio_matches_its_fresh_run() {
         let _serial = crate::test_support::serialize_real_model();
         let engine = DfEngine::new().expect("official LL model must construct");
-        let mut core = DspCore::new(engine, MODEL_SAMPLE_RATE)
+        let mut core = DspCore::new(engine, MODEL_SAMPLE_RATE, MODEL_HOP_SIZE as u32)
             .expect("48 kHz real DSP core must construct");
         assert_eq!(core.info().model, ll_model());
 

@@ -1,8 +1,8 @@
 //! Callback-owned host/worker bridge with timestamped wet/dry alignment.
 //!
-//! A worker result keeps the input stream index of its chunk. Two collected
-//! host quanta form the runway, so host output index `t` consumes worker stream
-//! index `t - 2 * host_quantum`; the worker DSP has already applied its own
+//! A worker result keeps the input stream index of its chunk. The negotiated
+//! callback-size-aware runway means host output index `t` consumes worker stream
+//! index `t - collection_runway`; the worker DSP has already applied its own
 //! intrinsic and resampler delay to that stream.
 
 use std::time::{Duration, Instant};
@@ -184,6 +184,7 @@ pub(crate) struct HostBridge<W = WorkerHandle> {
     dry_delay: Box<[DryFrame]>,
     dry_cursor: usize,
     pending_output: Option<AudioChunk>,
+    wet_valid_after: u64,
     queue_scan_limit: usize,
     offline_wait: Option<OfflineWait>,
     offline_timed_out: Option<(u64, u64)>,
@@ -254,10 +255,7 @@ impl<W: BridgeWorker> HostBridge<W> {
             return Err(BridgeConfigError::QueueCapacityMismatch);
         }
 
-        let collection_runway = config
-            .host_quantum
-            .checked_mul(RUNWAY_QUANTA)
-            .ok_or(BridgeConfigError::ArithmeticOverflow)?;
+        let collection_runway = dsp_info.latency.runway_delay_host;
         let reported_latency = usize::try_from(config.reported_latency)
             .map_err(|_| BridgeConfigError::ArithmeticOverflow)?;
         if reported_latency < collection_runway {
@@ -303,6 +301,7 @@ impl<W: BridgeWorker> HostBridge<W> {
             dry_delay: dry_delay.into_boxed_slice(),
             dry_cursor: 0,
             pending_output: None,
+            wet_valid_after: 0,
             queue_scan_limit: queue_capacity,
             offline_wait: None,
             offline_timed_out: None,
@@ -406,6 +405,7 @@ impl<W: BridgeWorker> HostBridge<W> {
         self.dry_delay.fill(DryFrame::default());
         self.dry_cursor = 0;
         self.pending_output = None;
+        self.wet_valid_after = 0;
         self.offline_wait = None;
         self.offline_timed_out = None;
         self.worker.request_reset(self.generation);
@@ -429,7 +429,7 @@ impl<W: BridgeWorker> HostBridge<W> {
         let wet = match self.process_mode {
             ProcessMode::Offline => self.wait_for_wet(output_time),
             ProcessMode::Realtime | ProcessMode::Buffered => self.poll_wet(output_time),
-        };
+        }.filter(|_| output_time >= self.wet_valid_after);
         self.output_samples = self.output_samples.wrapping_add(1);
 
         let mix = sanitize_mix(mix);
@@ -511,10 +511,22 @@ impl<W: BridgeWorker> HostBridge<W> {
         }
     }
 
-    fn defer_input(&mut self, chunk: AudioChunk) {
+    fn defer_input(&mut self, mut chunk: AudioChunk) {
         if self.deferred_len >= self.deferred_input.len() {
-            self.worker.mark_discontinuous();
-            return;
+            // Keep the current host/dry timeline intact while the worker starts
+            // fresh at the newest complete chunk. Stale queued generations are
+            // discarded by the worker and output matcher without callback waits.
+            self.generation = self.generation.wrapping_add(1);
+            chunk.set_generation(self.generation);
+            self.deferred_read = 0;
+            self.deferred_write = 0;
+            self.deferred_len = 0;
+            self.pending_output = None;
+            self.offline_wait = None;
+            self.offline_timed_out = None;
+            self.wet_valid_after = chunk.start_sample()
+                .saturating_add(self.reported_latency as u64);
+            self.worker.request_reset(self.generation);
         }
         let Some(slot) = self.deferred_input.get_mut(self.deferred_write) else {
             self.worker.mark_faulted();
@@ -560,7 +572,8 @@ impl<W: BridgeWorker> HostBridge<W> {
                     return wet;
                 }
                 PendingRelation::Stale => self.pending_output = None,
-                PendingRelation::Future | PendingRelation::Absent => break,
+                PendingRelation::Future => return None,
+                PendingRelation::Absent => break,
                 PendingRelation::Invalid => {
                     self.pending_output = None;
                     self.worker.mark_faulted();
@@ -1105,7 +1118,37 @@ mod tests {
         let full_bridge = HostBridge::build(full_worker, config).expect("full bridge must construct");
         let (full, full_bridge) = render_mono(full_bridge, &source, 32, 1.0);
         assert_close(&full, &expected);
-        assert!(full_bridge.status().input_discontinuous);
+        assert!(full_bridge.generation() > TEST_GENERATION);
+    }
+
+    #[test]
+    fn overflow_recovers_wet_without_resetting_stereo_dry_or_host_time() {
+        let mut worker = FakeWorker::delayed_identity(TEST_QUANTUM, TEST_CORE_DELAY);
+        worker.output_gain = 2.0;
+        let config = bridge_config(2, 32, ProcessMode::Realtime, &worker);
+        let mut bridge = HostBridge::build(worker, config).expect("bridge must construct");
+        let latency = bridge.reported_latency() as usize;
+        let mut rendered = Vec::new();
+
+        for block_index in 0..20 {
+            bridge.worker.always_full = (2..12).contains(&block_index);
+            let mut left = [1.0; 32];
+            let mut right = [3.0; 32];
+            bridge.process_stereo(&mut left, &mut right, || 1.0)
+                .expect("stereo block must process");
+            rendered.extend(left.into_iter().zip(right));
+        }
+        assert!(bridge.generation() > TEST_GENERATION);
+        assert_eq!(bridge.input_samples, 640);
+        assert_eq!(bridge.output_samples, 640);
+        assert_eq!(bridge.worker.acknowledged_generation(), bridge.generation());
+        for (left, right) in &rendered[latency..] {
+            assert!((*left == 1.0 && *right == 3.0) || (*left == 4.0 && *right == 4.0),
+                "recovery must select aligned dry or valid wet, never reset silence");
+        }
+        assert!(rendered[64..384].contains(&(1.0, 3.0)));
+        assert!(rendered[512..].iter().all(|frame| *frame == (4.0, 4.0)));
+        assert_eq!(bridge.worker.offline_wait_count, 0);
     }
 
     #[test]
@@ -1239,6 +1282,7 @@ mod tests {
         let worker = WorkerHandle::start(
             queue_capacity,
             host_sample_rate,
+            TEST_MAX_BLOCK,
             TEST_GENERATION,
             0.0,
         )
@@ -1284,9 +1328,9 @@ mod tests {
     fn real_offline_impulses_match_live_reported_latency_and_mix_alignment() {
         let _serial = crate::test_support::serialize_real_model();
         let cases = [
-            (48_000, 480, 0, 0, 480, 480, 960, 1_440, 0_usize),
-            (44_100, 441, 240, 220, 662, 882, 882, 1_764, 1_usize),
-            (96_000, 960, 240, 480, 1_440, 1_920, 1_920, 3_840, 1_usize),
+            (48_000, 480, 0, 0, 480, 480, 1_920, 2_400, 0_usize),
+            (44_100, 441, 240, 220, 662, 882, 1_764, 2_646, 1_usize),
+            (96_000, 960, 240, 480, 1_440, 1_920, 2_880, 4_800, 1_usize),
         ];
 
         for (

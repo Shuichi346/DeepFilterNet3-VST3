@@ -41,6 +41,13 @@
 
 ### Fixed
 
+- Corrected Attenuation Limit smoothing so a 50 ms change no longer takes
+  seconds when the host uses larger blocks.
+- Sized the reported processing delay for the host's maximum block size,
+  preventing routine large callbacks from losing noise reduction to dry fallback.
+- Restored enhancement automatically after input queue overload while preserving
+  the stereo dry timeline and rejecting stale worker output.
+
 - Made logical reset equivalent to a fresh model run and prevented pre-reset,
   late, or discontinuous worker output from entering a new host generation.
 - Made initialization failures select direct bypass instead of rejecting

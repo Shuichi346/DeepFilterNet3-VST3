@@ -83,6 +83,10 @@ impl AudioChunk {
         &self.samples[..self.len]
     }
 
+    pub(crate) fn set_generation(&mut self, generation: u64) {
+        self.generation = generation;
+    }
+
     fn is_well_formed(&self) -> bool {
         self.len <= MAX_HOST_QUANTUM
     }
@@ -181,6 +185,7 @@ impl WorkerHandle {
     pub(crate) fn start(
         queue_capacity: usize,
         host_sample_rate: usize,
+        max_buffer_size: u32,
         initial_generation: u64,
         attenuation: f32,
     ) -> Result<Self, WorkerError> {
@@ -201,6 +206,7 @@ impl WorkerHandle {
                     worker_control,
                     startup_tx,
                     host_sample_rate,
+                    max_buffer_size,
                 )
             })
             .map_err(|error| WorkerError::new(format!("could not spawn DeepFilterNet worker: {error}")))?;
@@ -385,10 +391,11 @@ fn worker_entry(
     control: Arc<WorkerControl>,
     startup: mpsc::SyncSender<Result<DspInfo, String>>,
     host_sample_rate: usize,
+    max_buffer_size: u32,
 ) {
     let startup_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         let engine = crate::model::DfEngine::new().map_err(|error| error.to_string())?;
-        DspCore::new(engine, host_sample_rate).map_err(|error| error.to_string())
+        DspCore::new(engine, host_sample_rate, max_buffer_size).map_err(|error| error.to_string())
     }));
     let mut core = match startup_result {
         Ok(Ok(core)) => core,
@@ -429,7 +436,7 @@ fn worker_loop(
     control: &WorkerControl,
 ) {
     let mut active_generation = control.acknowledged_generation.load(Ordering::Acquire);
-    let mut expected_input_start = 0_u64;
+    let mut expected_input_start = None;
 
     while !control.stop_requested.load(Ordering::Acquire) {
         let requested_generation = control.requested_generation.load(Ordering::Acquire);
@@ -438,7 +445,7 @@ fn worker_loop(
             active_generation = requested_generation;
             control.model_faulted.store(false, Ordering::Release);
             control.discontinuous.store(false, Ordering::Release);
-            expected_input_start = 0;
+            expected_input_start = None;
             control
                 .acknowledged_generation
                 .store(active_generation, Ordering::Release);
@@ -463,7 +470,7 @@ fn worker_loop(
             active_generation = requested_generation;
             control.model_faulted.store(false, Ordering::Release);
             control.discontinuous.store(false, Ordering::Release);
-            expected_input_start = 0;
+            expected_input_start = None;
             control
                 .acknowledged_generation
                 .store(active_generation, Ordering::Release);
@@ -472,7 +479,11 @@ fn worker_loop(
             control.faulted.store(true, Ordering::Release);
             break;
         }
-        if chunk.start_sample() != expected_input_start {
+        // Recovery may begin at a later absolute host timestamp. Once the first
+        // chunk is accepted, every subsequent chunk must remain contiguous.
+        if chunk.start_sample() % core.info().host_quantum as u64 != 0
+            || expected_input_start.is_some_and(|expected| chunk.start_sample() != expected)
+        {
             control.discontinuous.store(true, Ordering::Release);
             continue;
         }
@@ -504,10 +515,10 @@ fn worker_loop(
         if outcome.model_faulted {
             control.model_faulted.store(true, Ordering::Release);
         }
-        expected_input_start = match expected_input_start
+        expected_input_start = match chunk.start_sample()
             .checked_add(core.info().host_quantum as u64)
         {
-            Some(next) => next,
+            Some(next) => Some(next),
             None => {
                 control.faulted.store(true, Ordering::Release);
                 break;

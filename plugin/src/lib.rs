@@ -102,6 +102,7 @@ impl Plugin for DeepFilterPlugin {
         let Ok(worker) = WorkerHandle::start(
             queue_capacity,
             sample_rate,
+            buffer_config.max_buffer_size,
             0,
             self.params.atten_lim.value(),
         ) else {
@@ -142,7 +143,12 @@ impl Plugin for DeepFilterPlugin {
         _aux: &mut AuxiliaryBuffers,
         _context: &mut impl ProcessContext<Self>,
     ) -> ProcessStatus {
-        let attenuation = self.params.atten_lim.smoothed.next();
+        let samples = buffer.samples();
+        if samples == 0 {
+            return ProcessStatus::Normal;
+        }
+        // Smoother steps are audio samples, not host callbacks.
+        let attenuation = self.params.atten_lim.smoothed.next_step(samples as u32);
         let mix = &self.params.mix;
         let channels = buffer.as_slice();
 
@@ -383,6 +389,36 @@ mod tests {
             max_buffer_size: u32::MAX,
             process_mode: ProcessMode::Realtime,
         });
+    }
+
+    #[test]
+    fn attenuation_transition_uses_audio_time_for_every_block_size() {
+        for block_size in [1, 7, 128, 512, 1024, 4096] {
+            let mut plugin = DeepFilterPlugin::default();
+            plugin.params.atten_lim.smoothed.reset(100.0);
+            plugin.params.atten_lim.smoothed.set_target(48_000.0, 0.0);
+            let mut audio = vec![0.25; block_size];
+            let mut buffer = Buffer::default();
+            unsafe {
+                buffer.set_slices(block_size, |slices| {
+                    slices.clear();
+                    slices.push(audio.as_mut_slice());
+                });
+            }
+            let mut inputs = [];
+            let mut outputs = [];
+            let mut auxiliary = AuxiliaryBuffers { inputs: &mut inputs, outputs: &mut outputs };
+            let mut context = TestProcessContext::new(48_000.0);
+            let mut elapsed = 0;
+            while elapsed < 2400 {
+                plugin.process(&mut buffer, &mut auxiliary, &mut context);
+                elapsed += block_size;
+                let expected = 100.0 * (1.0 - (elapsed as f32 / 2400.0).min(1.0));
+                assert!((plugin.params.atten_lim.smoothed.previous_value() - expected).abs() < 0.01,
+                    "block {block_size} must advance smoothing by its sample count");
+            }
+            assert_eq!(plugin.params.atten_lim.smoothed.previous_value(), 0.0);
+        }
     }
 
     #[test]

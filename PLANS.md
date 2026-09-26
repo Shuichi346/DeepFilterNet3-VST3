@@ -2,6 +2,37 @@
 
 This plan is a living document. Keep `Resume Here`, `Progress`, `Decision Log`, `Surprises & Discoveries`, and `Outcomes & Retrospective` current during execution. `UPDATE_PLANS.md` is the user-authored requirements brief and remains unchanged; this file turns it into a bounded, resumable execution specification.
 
+## Progress Status — operational repairs, 2026-09-26
+
+The user explicitly requested repair of the audit findings. This extension supersedes the earlier green stop for the scoped repairs and invalidates old binary/manual-host evidence once source changes. Historical acceptance attempts remain recorded; the units below have separate finite budgets for this new request.
+
+- [x] P10: Design and verification scope saved before production changes.
+- [x] I10: Source changes and targeted tests implemented; source inspection preserves callback ownership, IDs, and the dry timeline. Behavioral acceptance remains V10.1–V10.3.
+- [x] V10.1: PASS — execution 2 passed all 31 library tests in 22.19 s after dependency compilation; execution 1 was a Cargo-cache permission denial. Evidence: `/private/tmp/deepfilter-fix-tests.log`.
+- [x] V10.2: PASS — execution 1 built the allocation-asserting bundles and pluginval strictness 5 ended SUCCESS at 02:48Z. Nonfatal framework DPI/Arc warnings remain; no allocation abort. Evidence: `/private/tmp/deepfilter-fix-pluginval.log`.
+- [x] I10.D: Both READMEs now document maximum-block-dependent latency and automatic recovery; CHANGELOG, NOTES, and AGENTS retain the resulting behavior/invariants. Whitespace inspection passed.
+- [x] V10.3: PASS — execution 1 built the optimized release and the asserted probe ended REGRESSION_MATRIX_PASS. Package execution 1 verified arm64, ad-hoc signatures, ZIP integrity, and SHA-256. No further regression checks are planned.
+
+Current: Complete. Next: None. The separate installation approval was granted through the execution permission flow; the verified VST3 was installed without changing Resolve state. An already running host needs to reload the plugin or restart to use the replacement.
+
+Final evidence: all 31 Rust tests and allocation-asserting pluginval strictness 5 passed. The release probe measured 0.000% exact-dry substitution at 48 kHz blocks 128/512/1024/4096, versus the old 27.333%/81.467% at 1024/4096. The 100-to-0 change is transparent at the 100 ms measurement plus reported latency, and forced-overrun recovery resumes enhancement within the one-second observation. Actual enhanced speech remains finite, non-silent, and bit-identical on repeat after reset at 44.1/48/96 kHz. Impulse alignment comes from V10.1, not the suppressed enhanced-impulse residual printed by the probe.
+
+Accepted executable SHA-256: `1a018b516090bfd434d423b03a667c763d362bd84e38c0c8e9253a70a6e55805`. Package: `dist/DeepFilterNR-v0.6.0-fix-20260926-macos-arm64.zip` and `.zip.sha256`; archive hash `cd9a89641a086970dfeff7e07975e841360fe655a2dea3a0a46be7e87731230f`. The previous v0.6.0 archive remains intact. No commit, push, publication, or Resolve mutation occurred.
+
+Installed artifact: `/Users/shuichi/Library/Audio/Plug-Ins/VST3/deepfilter-vst.vst3`; replacement hash matches the accepted executable above. Previous installed bundle was moved intact to `dist/installed-backup-20260926/deepfilter-vst.vst3`. Installation staged and verified the new bundle before swapping directories, preserving the old mapped executable for any running host. CLAP remains available in the release bundle/package and was not installed system-wide.
+
+### Repair design and acceptance
+
+- Advance attenuation smoothing by the number of samples in each callback, using the pinned smoother's `next_step()`; skip advancement for empty buffers. Parameter updates remain block-based as declared by the plugin. Preserve parameter IDs, 50 ms smoothing, controls, and worker ownership.
+- Compute worker collection runway as `(ceil(max_buffer_size / host_quantum) + 1) * host_quantum`, with checked arithmetic and a minimum of two quanta. Include this fixed-per-initialization runway in the live latency metadata and both dry/wet timelines. Queue bounds and safe bypass remain enforced. Larger host blocks necessarily report more latency; do not silently miss enhancement to preserve the old latency numbers.
+- On deferred-input exhaustion, request a new worker generation at the newest complete input chunk, discard obsolete deferred work, and preserve absolute host counters and the per-channel dry delay. The worker accepts the first aligned timestamp of a new generation, then requires continuity. Suppress newly reset wet history until that generation has enough input for the full model/resampler delay, using aligned dry during recovery. No callback allocation, lock, wait, model clone, or thread operation.
+- Add deterministic coverage proving recovery returns enhanced output without a host reset, startup zeros, stale-generation replay, or dry latency change. Retain mono/stereo, partition, reset, supported-rate, and bounded-offline tests.
+- V10.1 command: `cargo test --locked -p deepfilter-vst --lib`; expected exit 0; 20-minute limit; at most 3 executions including post-repair retries.
+- V10.2 command: `cargo xtask bundle deepfilter-vst --features nice-plug/assert_process_allocs` followed by `/Applications/pluginval.app/Contents/MacOS/pluginval --strictness-level 5 --validate-in-process target/bundled/deepfilter-vst.vst3`; expected exit 0 and SUCCESS; 20-minute limit; at most 3 executions. A permission-only denial is recorded separately from an actual launched verifier.
+- V10.3: `cargo xtask bundle deepfilter-vst --release`, then the existing `/private/tmp/deepfilter-audit-20260926/probe` rebuilt with assertions for 128/512/1024/4096 paced processing, prompt 100-to-0 parameter response, reset repeatability at 44.1/48/96 kHz, and automatic recovery following forced overflow. Expected finite audio, <=1% dry substitution in each steady real-time case, transparent 0 dB output after 50 ms plus one block and reported latency, repeatable non-silent offline speech, and recovered enhancement within one second after overload. At most 3 executions; 20-minute build and 2-minute probe limits. Then `./scripts/package-release.sh 0.6.0-fix-20260926` (at most 2 executions, 2-minute limit) preserves the existing v0.6.0 archive and verifies arm64/signature/ZIP/checksums. No other automated verification after this gate passes.
+- No dependency upgrades, version/identity migration, system plugin replacement, Resolve mutation, publication, or unrelated cleanup. Installed plugin replacement remains a separate deployment action after the concrete verified bundle exists. Documentation uses the update-repo-docs workflow after implementation; no manual host matrix is required to complete this scoped repair.
+- Dependency evidence: pinned [nice-plug-core 0.2.0 Smoother](https://docs.rs/nice-plug-core/0.2.0/nice_plug_core/params/smoothing/struct.Smoother.html), retrieved in the audit, defines `next()` as one sample and `next_step(n)` as n samples; official CLAP headers and binary-host protocol are recorded in the audit below.
+
 ## Overview
 
 Revise the existing Rust plugin into a native Apple Silicon VST3/CLAP plugin based entirely on nice-plug and the official DeepFilterNet v0.5.6 low-latency model. The finished plugin must continuously process mono or stereo host audio through one mono model, handle arbitrary host block sizes, report measured latency, align dry and wet paths, reset to a fresh logical state, stream-resample common non-48 kHz rates, and use the same DSP path during real-time, buffered, and offline operation.
@@ -9,6 +40,10 @@ Revise the existing Rust plugin into a native Apple Silicon VST3/CLAP plugin bas
 The real-time audio callback will not run `DfTract` directly because v0.5.6's Tract inference allocates internally. A persistent worker will own model inference and both streaming resamplers. The callback will use preallocated fixed-size chunks, lock-free SPSC queues, generation and timestamp matching, and a latency-aligned dry fallback. Offline mode may wait with a finite deadline for the same worker output; it does not use a second renderer or DSP implementation.
 
 ## Resume Here
+
+- Audit follow-up 2026-09-26 02:36Z: COMPLETE — the user requested a fresh check for hidden operational defects. Checkout started clean on `main` at `11e28ce`; only this audit record is modified. Earlier branch/worktree details below are historical. Installed user VST3, bundled VST3, and bundled CLAP executable SHA-256 all equal `5145ad6eec530145350647ba7a3430a8cd34fc117fa1415d8cf78e6b1a7b016d`. The audit confirmed two operational defects and one overload limitation; see the final audit section.
+- Audit scope: source/dependency inspection plus a bounded standalone host probe of the existing binary (SC-3 through SC-9). This new diagnostic request authorizes the audit separately from completed release acceptance; the final release counter stays 4/4. No production edits, rebuild, installation, Resolve mutation, or publication. Temporary probe code/logs live under `/private/tmp/deepfilter-audit-20260926`. Allow one probe matrix with at most one harness-only correction/retry, covering parameter response, paced real-time block sizes, actual enhanced offline output/reset/latency at 44.1/48/96 kHz, and overload fallback. Stop after the matrix and evidence review; findings are reported without repair.
+- Audit next action: report findings. Any future repair needs its own bounded implementation/acceptance revision; the historical release green stop and 4/4 counter remain unchanged. Both allowed probe executions exited 0; execution 2 corrected host-side parameter range mapping and replaced the reset fixture with non-silent speech. No further automated checks are planned.
 
 - Updated: 2026-08-12 05:10Z
 - Overall status: COMPLETE — refined two-slider editor and release bundles
@@ -728,3 +763,48 @@ With approval for any required user plugin-directory and Resolve changes, run th
 - The prior MIT Apple Silicon distribution candidate is `dist/DeepFilterNR-v0.5.0-macos-arm64.zip` with historical accepted hash `b50c4e97073743cc91c905a04e9c349de4bd96fc181f8f3d3dcae34d4fb43204`. It predates the GUI, is now superseded, and will not be regenerated or published in Phase 8.
 - DaVinci Resolve 21 has one user-confirmed successful Deliver export with the plug-in applied. That host evidence predates the custom editor; the README image now shows the current refined editor and is not host-validation evidence.
 - Remaining completion condition: SC-11 separately remains open because its full repeatability, interaction, latency, and multi-rate evidence was not captured by the user-reported Resolve 21 export, and that partial evidence predates the GUI artifact.
+
+## Operational audit — 2026-09-26
+
+Status: COMPLETE at 02:36Z. Review only; production source and installed/bundled binaries are unchanged. Historical acceptance did not establish freedom from the defects below.
+
+### Method and limits
+
+- Loaded the existing v0.6.0 executable through its exported CLAP entry point using a temporary C++ host. Its SHA-256 matches the installed VST3 exactly. This directly exercises the shared plugin/DSP implementation, but does not replace VST3-wrapper or Resolve integration testing.
+- Used official CLAP headers at commit `a47f6badb49d948fd009998f28309cdab78979c9`, separate main/audio threads, mono input, correct activation/reset lifecycle, parameter metadata, render-mode and latency extensions, and finite-output assertions. Real-time calls were paced to host audio time using absolute deadlines.
+- Source: `/private/tmp/deepfilter-audit-20260926/probe.cpp`; authoritative log: `/private/tmp/deepfilter-audit-20260926/results-corrected.log`. These are temporary local artifacts. Command: `clang++ -std=c++17 -O2 -I /private/tmp/deepfilter-audit-20260926/clap/include /private/tmp/deepfilter-audit-20260926/probe.cpp -o /private/tmp/deepfilter-audit-20260926/probe`, then run that executable with the absolute bundled CLAP executable path.
+- Execution 1 incorrectly passed 20 as a CLAP parameter value, whose advertised range is 0..1. Execution 2 maps 20 dB to 0.2 and uses the first three seconds of repository speech for the reset test; the real-time default-100-dB and 100-to-0 transition cases were unaffected and reproduced in both executions. The source WAV is 48 kHz mono PCM24; 44.1/96 kHz speech fixtures use simple linear interpolation in the test host, not a change to plugin resampling.
+- No Rust-suite/pluginval rerun, rebuild, installation, Resolve project mutation, or GUI test. Pure-noise suppression is not a perceptual speech-quality measurement. The isolated enhanced impulse was suppressed almost to zero, so its largest residual peak is not valid new latency evidence; historical zero-attenuation alignment tests remain the only recorded impulse proof.
+
+### Confirmed defect: attenuation smoothing advances per callback instead of per sample
+
+`plugin/src/lib.rs:145` calls the attenuation smoother once per host callback, although `plugin/src/params.rs:24` configures 50 ms sample-based smoothing. [The pinned Smoother API](https://docs.rs/nice-plug-core/0.2.0/nice_plug_core/params/smoothing/struct.Smoother.html) requires `next()` once per sample. At a constant block size B, the transition takes approximately 0.05 * B seconds of audio rather than 0.05 seconds (6.4 s at 128, 25.6 s at 512, 51.2 s at 1024).
+
+Actual binary reproduction: 48 kHz, Offline, 512 samples, Mix 100%, attenuation 100 -> 0. The host parameter reports 0, but the processed signal remains attenuated by about 95.8 dB after 1 second, 60.7 dB after 10 seconds, and 21.6 dB after 20 seconds. At about 25.8 seconds after the change, output becomes exactly the latency-aligned raw input. This affects manual changes and automation; fixed settings established before reset can conceal it. Repair should advance smoothing in audio-sample time without placing model calls in the callback.
+
+### Confirmed defect: ordinary large real-time blocks lose enhancement
+
+`plugin/src/dsp.rs:42` reserves only two model-derived host quanta, independent of the advertised maximum callback size. At 48 kHz that is 960 samples of collection runway. Within a large callback, the bridge reaches output deadlines before the worker has wall-clock time to produce the corresponding frames. `plugin/src/bridge.rs:435` then substitutes aligned dry, including at Mix 100%. Increasing queue capacity alone does not supply this processing time.
+
+Measured using two seconds of deterministic white noise, default 100 dB attenuation, normal wall-clock pacing; statistics exclude the first 0.5 seconds:
+
+| Host block at 48 kHz | Samples exactly equal to aligned dry |
+| --- | ---: |
+| 128 | 0.000% |
+| 512 | 0.000% |
+| 1024 | 27.333% |
+| 4096 | 81.467% |
+
+Both executions produced the same percentages on this machine. These are observations for this fixture and host, not guaranteed rates for every DAW or machine. The effect can audibly let noise through without a crash or silence. The earlier partition tests use an immediately responding fake worker, so they cannot prove real-worker deadline coverage. Repair needs a callback-size-aware latency/scheduling policy and corresponding real-worker evidence.
+
+### Confirmed conditional limitation: queue overflow latches dry-only output
+
+A deliberately accelerated real-time input burst exhausted the pending-input capacity. After returning to normally paced 128-sample callbacks, the measured final half-second remained 100% aligned dry despite Mix 100% and default attenuation. `bridge.rs:514` sets the discontinuity flag, `worker.rs:246` refuses further input while it is set, and only worker generation reset clears that flag. There is no recovery-on-load-relief or visible status indicator in the existing two-control editor. This is the implemented protective policy, not evidence that the user's normal session has overflowed. Host reset/reinitialization is needed to restore processing after this condition.
+
+### Positive observations
+
+- At 128 and 512 samples under the tested paced real-time conditions, the model suppressed the synthetic noise and no exact-dry substitutions were observed in the measurement window.
+- At 44.1, 48, and 96 kHz, actual speech processed in Offline mode at 20 dB attenuation remained finite and non-silent, and complete output arrays were bit-identical after reset and repeat processing. This exercises selected model output, unlike the existing zero-attenuation bridge repeatability test.
+- The binary reports 1764, 1440, and 3840 latency samples at those respective rates. These are reported values, not a new enhanced-impulse measurement.
+- At the unsupported 32001 Hz rate, the binary reports zero latency and produces bit-exact direct bypass.
+- No crashes or process-error returns occurred in either bounded probe execution. The user's successful everyday use is consistent with these observations, but does not rule out the confirmed parameter-response and large-block defects.
