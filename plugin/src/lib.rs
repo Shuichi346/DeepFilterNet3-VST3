@@ -27,7 +27,7 @@ enum ProcessingState {
 
 struct DeepFilterPlugin {
     params: Arc<DeepFilterParams>,
-    editor_state: Arc<nice_plug_egui::EguiState>,
+    editor_state: Arc<nice_plug_egui::EguiEditorState>,
     processing: ProcessingState,
 }
 
@@ -66,20 +66,21 @@ impl Plugin for DeepFilterPlugin {
 
     type SysExMessage = ();
     type BackgroundTask = ();
+    type Editor = nice_plug_egui::EguiEditor<editor::DeepFilterEditor>;
 
     fn params(&self) -> Arc<dyn Params> {
         self.params.clone()
     }
 
-    fn editor(&mut self, _async_executor: AsyncExecutor<Self>) -> Option<Box<dyn Editor>> {
+    fn editor(&mut self, _async_executor: AsyncExecutor<Self>) -> Option<Self::Editor> {
         editor::create(self.params.clone(), self.editor_state.clone())
     }
 
-    fn initialize(
+    fn activate(
         &mut self,
         audio_io_layout: &AudioIOLayout,
         buffer_config: &BufferConfig,
-        context: &mut impl InitContext<Self>,
+        context: &mut impl ActivateContext<Self>,
     ) -> bool {
         self.shutdown_active();
         context.set_latency_samples(0);
@@ -273,11 +274,11 @@ mod tests {
 
     use super::*;
 
-    struct TestInitContext {
+    struct TestActivateContext {
         latency: Cell<u32>,
     }
 
-    impl TestInitContext {
+    impl TestActivateContext {
         fn new() -> Self {
             Self {
                 latency: Cell::new(u32::MAX),
@@ -285,7 +286,7 @@ mod tests {
         }
     }
 
-    impl InitContext<DeepFilterPlugin> for TestInitContext {
+    impl ActivateContext<DeepFilterPlugin> for TestActivateContext {
         fn plugin_api(&self) -> PluginApi {
             PluginApi::Vst3
         }
@@ -328,7 +329,14 @@ mod tests {
             None
         }
 
-        fn send_event(&mut self, _event: PluginNoteEvent<DeepFilterPlugin>) {}
+        fn try_send_event(
+            &mut self,
+            event: PluginNoteEvent<DeepFilterPlugin>,
+        ) -> Result<(), (PluginNoteEvent<DeepFilterPlugin>, nice_plug::context::process::SendEventError)> {
+            Err((event, nice_plug::context::process::SendEventError::NoOutputBuffer))
+        }
+
+        fn request_restart(&self) {}
 
         fn set_latency_samples(&self, _samples: u32) {}
 
@@ -337,9 +345,9 @@ mod tests {
 
     fn assert_initialization_falls_back_to_direct_bypass(config: BufferConfig) {
         let mut plugin = DeepFilterPlugin::default();
-        let context = TestInitContext::new();
+        let context = TestActivateContext::new();
         let mut context = context;
-        assert!(plugin.initialize(
+        assert!(plugin.activate(
             &DeepFilterPlugin::AUDIO_IO_LAYOUTS[0],
             &config,
             &mut context,
@@ -426,7 +434,7 @@ mod tests {
         let mut plugin = DeepFilterPlugin::default();
         let executor = AsyncExecutor::new(Arc::new(|_| {}), Arc::new(|_| {}));
         let editor = plugin.editor(executor).expect("custom editor should exist");
-        let size = editor.size().to_logical::<f32>(1.0);
+        let size = editor.size().cast::<f32>().to_logical(1.0);
 
         assert_eq!(size.width, editor::EDITOR_WIDTH);
         assert_eq!(size.height, editor::EDITOR_HEIGHT);

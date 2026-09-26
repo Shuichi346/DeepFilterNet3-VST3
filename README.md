@@ -64,11 +64,11 @@ The plug-in bypassed and enabled:
 | Component | Role |
 | :--- | :--- |
 | Rust 2021 workspace | Plugin, DSP bridge, tests, and bundle task |
-| [nice-plug 0.2.3](https://codeberg.org/RustAudio/nice-plug) | VST3/CLAP framework and exports |
-| [nice-plug-egui 0.3.0](https://codeberg.org/RustAudio/nice-plug/src/branch/main/crates/nice-plug-egui) / [egui 0.35.0](https://github.com/emilk/egui/tree/0.35.0) | Embedded two-slider custom editor |
+| [nice-plug 0.4.2](https://codeberg.org/RustAudio/nice-plug) | VST3/CLAP framework and exports |
+| [nice-plug-egui 0.5.1](https://codeberg.org/RustAudio/nice-plug/src/branch/main/crates/nice-plug-egui) / [egui 0.36.2](https://github.com/emilk/egui/tree/0.36.2) | Embedded two-slider custom editor |
 | [DeepFilterNet 0.5.6](https://github.com/Rikorose/DeepFilterNet/tree/v0.5.6) | Official embedded model and Tract inference |
 | [rubato 0.14.1](https://github.com/HEnquist/rubato/tree/v0.14.1) | Persistent fixed-size sample-rate conversion |
-| [rtrb 0.3.3](https://github.com/mgeier/rtrb/tree/0.3.3) | Lock-free worker queues |
+| [rtrb 0.3.5](https://github.com/mgeier/rtrb/tree/0.3.5) | Lock-free worker queues |
 
 ## Current validation scope
 
@@ -119,7 +119,7 @@ At 48 kHz, maximum blocks of 128, 512, and 4096 samples report 30, 40, and 110 m
 ## Requirements
 
 - Apple Silicon Mac running macOS 26.x or later for the validated configuration.
-- Rust 1.87 or later to build nice-plug 0.2.3.
+- Rust 1.95 or later to build the pinned framework and egui dependencies.
 - A VST3- or CLAP-compatible host.
 
 The build downloads Rust dependencies and the pinned official DeepFilterNet v0.5.6 source/model archive.

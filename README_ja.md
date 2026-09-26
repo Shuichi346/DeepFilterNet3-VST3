@@ -64,11 +64,11 @@ DeepFilterNet3 VST3 は、公式 DeepFilterNet v0.5.6 モデルをリアルタ�
 | コンポーネント | 役割 |
 | :--- | :--- |
 | Rust 2021 ワークスペース | プラグイン、DSP ブリッジ、テスト、バンドルタスク |
-| [nice-plug 0.2.3](https://codeberg.org/RustAudio/nice-plug) | VST3/CLAP フレームワークとエクスポート |
-| [nice-plug-egui 0.3.0](https://codeberg.org/RustAudio/nice-plug/src/branch/main/crates/nice-plug-egui) / [egui 0.35.0](https://github.com/emilk/egui/tree/0.35.0) | 組み込み 2 スライダーカスタムエディタ |
+| [nice-plug 0.4.2](https://codeberg.org/RustAudio/nice-plug) | VST3/CLAP フレームワークとエクスポート |
+| [nice-plug-egui 0.5.1](https://codeberg.org/RustAudio/nice-plug/src/branch/main/crates/nice-plug-egui) / [egui 0.36.2](https://github.com/emilk/egui/tree/0.36.2) | 組み込み 2 スライダーカスタムエディタ |
 | [DeepFilterNet 0.5.6](https://github.com/Rikorose/DeepFilterNet/tree/v0.5.6) | 公式組み込みモデルと Tract 推論 |
 | [rubato 0.14.1](https://github.com/HEnquist/rubato/tree/v0.14.1) | 固定サイズ永続サンプルレート変換 |
-| [rtrb 0.3.3](https://github.com/mgeier/rtrb/tree/0.3.3) | ロックフリーワーカーキュー |
+| [rtrb 0.3.5](https://github.com/mgeier/rtrb/tree/0.3.5) | ロックフリーワーカーキュー |
 
 ## 現在の検証範囲
 
@@ -110,7 +110,7 @@ Mix 値 0%、50%、100% はいずれも報告されたレイテンシでピー�
 ## 要件
 
 - 検証済み構成として、macOS 26.x 以降を搭載した Apple Silicon Mac。
-- nice-plug 0.2.3 をビルドするには Rust 1.87 以降。
+- 固定されたフレームワークと egui の依存関係をビルドするには Rust 1.95 以降。
 - VST3 または CLAP 対応ホスト。
 
 ビルド時に Rust 依存関係と固定された公式 DeepFilterNet v0.5.6 のソース/モデルアーカイブがダウンロードされます。

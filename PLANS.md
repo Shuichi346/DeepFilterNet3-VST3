@@ -18,8 +18,25 @@ This is the sole authoritative checklist. `UPDATE_PLANS.md` remains the original
 - [x] V12: Release build passed on execution 1 in 6.25 s; exported CLAP descriptor reports 0.7.0 from the shared plugin VERSION constant. Packaging execution 1 passed architecture/signature/ZIP/SHA-256 checks. Existing DSP tests were not repeated for version-only changes.
 - [x] I12.D: Installed the verified v0.7.0 VST3 with matching executable hash; previous installed bundle is preserved at `dist/installed-backup-before-v070/deepfilter-vst.vst3`. No Resolve mutation or publication.
 
-Current: Complete — v0.7.0 version update, packaging, and local VST3 installation.
-Next: None. Running hosts need to reload the plugin or restart.
+- [x] I13: Upgrade nice-plug 0.4.2, nice-plug-egui 0.5.1, egui 0.36.2, rtrb 0.3.5, and log 0.4.34; migrate lifecycle/editor APIs and retain fixed two-control behavior.
+- [x] V13.1: Run all library tests once (20 minutes, at most three executions including focused repairs).
+- [x] V13.2: Build allocation-asserting bundles and run pluginval strictness 5 (20 minutes per unit, at most three executions each).
+- [x] V13.3: Build optimized bundles, package under an unused dependency-update suffix using the release script, and inspect documentation/notices and diff (20 minutes build; two packaging executions maximum).
+- [x] D13: Update current dependency/compiler documentation and record verification and remaining manual-host limits.
+
+Current: Complete — recommended dependency upgrades and automated acceptance.
+Next: None for this request. Manual Resolve acceptance remains deferred; installation and publication were not performed.
+
+V13.3/D13: Optimized VST3/CLAP build passed on execution 1 in 1m 50s; packaging passed on execution 1 with thin arm64, ad-hoc signatures, ZIP integrity, and SHA-256 verification. Package excludes README media and contains the updated notices. README versions/compiler requirement, changelog, engineering notes, and license notices were reviewed; `git diff --check` passed. Logs: `/private/tmp/deepfilter-upgrade-release.log` and `/private/tmp/deepfilter-upgrade-package.log`.
+Executable SHA-256: `4457eeffad7433d4e6944df1f98a906f1d6f20e06239154c9d98391c9c437d1c`.
+Package: `dist/DeepFilterNR-v0.7.0-deps-20260926-macos-arm64.zip` and `.zip.sha256`; archive SHA-256: `3ca36e5d4a5730f7c8a7c89b4641d7d595a9c7de9e58e4e4528b9fd7c8d9db19`.
+Plugin version remains 0.7.0; the archive suffix distinguishes this dependency-update build. The prior installed bundle and archives are unchanged. V10 operational-probe measurements are historical; this migration has fresh library and pluginval evidence, not a fresh paced-host probe or manual Resolve result.
+
+V13.2: Allocation-asserting VST3/CLAP bundles built successfully; pluginval strictness 5 finished with SUCCESS on execution 1, including editor, editor automation, state, bus, and multi-rate processing checks. Logs: `/private/tmp/deepfilter-upgrade-debug.log` and `/private/tmp/deepfilter-upgrade-pluginval.log`. Initial bundler metadata cache denial was resolved with permission. Eight existing private-interface/dead-code build warnings remain. External Steinberg validator was unconfigured and skipped.
+
+V13.1: 31/31 tests passed in 21.79 s on execution 2 after a GuiContext import correction; initial cache permission denial did not launch compilation. Log: `/private/tmp/deepfilter-upgrade-tests.log`. Two existing unused-mut warnings in bridge tests remain.
+
+Scope: User authorized the recommended framework/editor and maintenance dependency upgrades on 2026-09-26. Keep DeepFilterNet, ndarray, Tract, rubato, model features, DSP algorithms, identities, and version 0.7.0. Framework changes require fresh automated host evidence; prior installed/released binaries remain historical and manual Resolve acceptance remains deferred. No installation or publication is included. A fresh release build is packaged with a unique suffix to preserve existing archives.
 
 V12 executable SHA-256: `83e3f1e5abe78e9b893c3b344b5c4836fd8c5e85d69f00a071d92935ba32be9d`.
 Package: `dist/DeepFilterNR-v0.7.0-macos-arm64.zip` and `.zip.sha256`; archive SHA-256: `b79a8aeea40e02e4a7e79c3adb6e78d984bd49e7f30d8c00f33d2f6fa8060095`.
@@ -31,7 +48,7 @@ Save this tracker after each implementation step or independent verification uni
 
 Maintain a native Apple Silicon macOS VST3/CLAP noise-reduction plugin with official DeepFilterNet3-LL inference, continuous mono/stereo processing, aligned dry/wet output, complete reset, and a fixed English two-control editor. Real-time, buffered, and offline rendering share one DSP implementation.
 
-The current request is the v0.7.0 version update. Change version metadata and current documentation examples, recreate release artifacts, and refresh the previously authorized local VST3 installation. DSP, dependencies, plugin/parameter identities, and host project state remain unchanged. The new build supersedes the earlier binary hashes; existing behavioral evidence remains applicable.
+The current request is the I13 dependency upgrade scoped above. Preserve the existing DSP architecture and product contracts; revalidate the changed framework and editor integration before producing local release artifacts.
 
 Preserve these product requirements:
 

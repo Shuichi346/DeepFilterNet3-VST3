@@ -5,8 +5,12 @@ use egui::{
     Sense, Stroke, TextEdit, TextStyle, Visuals, pos2, vec2,
 };
 use nice_plug::editor::dpi::LogicalSize;
-use nice_plug::prelude::{Editor, FloatParam, Param, ParamSetter};
-use nice_plug_egui::{EguiNiceSettings, EguiState, create_egui_editor};
+use nice_plug::context::gui::GuiContext;
+use nice_plug::prelude::{FloatParam, Param, ParamSetter};
+use nice_plug_egui::{
+    EguiEditor, EguiEditorState, EguiNiceSettings, NiceEguiApp, RepaintNotifier,
+    create_egui_editor,
+};
 
 use crate::params::DeepFilterParams;
 
@@ -62,58 +66,91 @@ struct ParameterControlState {
     drag_start_x: f32,
 }
 
-pub(crate) fn default_state() -> Arc<EguiState> {
-    EguiState::from_size(LogicalSize::new(EDITOR_WIDTH, EDITOR_HEIGHT))
+pub(crate) fn default_state() -> Arc<EguiEditorState> {
+    EguiEditorState::from_size(LogicalSize::new(EDITOR_WIDTH, EDITOR_HEIGHT), 1.0)
+}
+
+pub(crate) struct DeepFilterEditor {
+    params: Arc<DeepFilterParams>,
+    gui_context: Option<GuiContext>,
+    state: EditorUiState,
 }
 
 pub(crate) fn create(
     params: Arc<DeepFilterParams>,
-    state: Arc<EguiState>,
-) -> Option<Box<dyn Editor>> {
+    state: Arc<EguiEditorState>,
+) -> Option<EguiEditor<DeepFilterEditor>> {
     create_egui_editor(
         state,
-        EditorUiState::default(),
+        RepaintNotifier::default(),
         EguiNiceSettings {
             title: String::from("DeepFilter Noise Reduction"),
             ..Default::default()
         },
-        |context, _commands, _state| {
-            let mut visuals = Visuals::dark();
-            visuals.panel_fill = BACKGROUND;
-            visuals.window_fill = BACKGROUND;
-            visuals.widgets.inactive.fg_stroke = Stroke::new(1.0, PRIMARY_TEXT);
-            visuals.widgets.hovered.fg_stroke = Stroke::new(1.0, PRIMARY_TEXT);
-            visuals.widgets.active.fg_stroke = Stroke::new(1.0, PRIMARY_TEXT);
-            visuals.selection.bg_fill = ACCENT;
-            visuals.selection.stroke = Stroke::new(1.0, PRIMARY_TEXT);
-            context.set_visuals(visuals);
-        },
-        move |ui, setter, _commands, state| {
-            Frame::new()
-                .fill(BACKGROUND)
-                .inner_margin(Margin::symmetric(20, 15))
-                .show(ui, |ui| {
-                    ui.set_width(EDITOR_WIDTH - 40.0);
-                    parameter_control(
-                        ui,
-                        "Attenuation Limit",
-                        &params.atten_lim,
-                        setter,
-                        &mut state.attenuation,
-                        ATTENUATION_PRESENTATION,
-                    );
-                    ui.add_space(12.0);
-                    parameter_control(
-                        ui,
-                        "Mix",
-                        &params.mix,
-                        setter,
-                        &mut state.mix,
-                        MIX_PRESENTATION,
-                    );
-                });
+        DeepFilterEditor {
+            params,
+            gui_context: None,
+            state: EditorUiState::default(),
         },
     )
+}
+
+impl NiceEguiApp for DeepFilterEditor {
+    fn build(
+        &mut self,
+        context: egui::Context,
+        gui_context: GuiContext,
+        _frame: &mut nice_plug_egui::Frame,
+    ) -> Result<(), nice_plug_egui::baseview::HandlerError> {
+        let mut visuals = Visuals::dark();
+        visuals.panel_fill = BACKGROUND;
+        visuals.window_fill = BACKGROUND;
+        visuals.widgets.inactive.fg_stroke = Stroke::new(1.0, PRIMARY_TEXT);
+        visuals.widgets.hovered.fg_stroke = Stroke::new(1.0, PRIMARY_TEXT);
+        visuals.widgets.active.fg_stroke = Stroke::new(1.0, PRIMARY_TEXT);
+        visuals.selection.bg_fill = ACCENT;
+        visuals.selection.stroke = Stroke::new(1.0, PRIMARY_TEXT);
+        context.set_visuals(visuals);
+        self.gui_context = Some(gui_context);
+        // A reopened window must not inherit an unfinished edit or drag gesture.
+        self.state = EditorUiState::default();
+        Ok(())
+    }
+
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut nice_plug_egui::Frame) {
+        let Some(context) = &self.gui_context else {
+            return;
+        };
+        let setter = context.param_setter();
+        Frame::new()
+            .fill(BACKGROUND)
+            .inner_margin(Margin::symmetric(20, 15))
+            .show(ui, |ui| {
+                ui.set_width(EDITOR_WIDTH - 40.0);
+                parameter_control(
+                    ui,
+                    "Attenuation Limit",
+                    &self.params.atten_lim,
+                    &setter,
+                    &mut self.state.attenuation,
+                    ATTENUATION_PRESENTATION,
+                );
+                ui.add_space(12.0);
+                parameter_control(
+                    ui,
+                    "Mix",
+                    &self.params.mix,
+                    &setter,
+                    &mut self.state.mix,
+                    MIX_PRESENTATION,
+                );
+            });
+    }
+
+    fn editor_closed(&mut self) {
+        self.gui_context = None;
+        self.state = EditorUiState::default();
+    }
 }
 
 fn parameter_control(

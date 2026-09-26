@@ -1,7 +1,7 @@
 Embedded GUI Font Licenses
 ==========================
 
-The epaint_default_fonts 0.35.0 crate embeds the fonts used by the custom
+The epaint_default_fonts 0.36.2 crate embeds the fonts used by the custom
 editor. The notices and license texts below are reproduced from that crate's
 fonts directory.
 

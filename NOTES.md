@@ -2,6 +2,28 @@
 
 ## 2026-09-26
 
+- Upgraded nice-plug/nice-plug-egui together to 0.4.2/0.5.1 and egui to
+  0.36.2, with rtrb 0.3.5 and log 0.4.34 maintenance updates. The framework
+  uses `activate`/`ActivateContext` and a concrete editor type; the GUI uses
+  `NiceEguiApp` with host-driven repaint notifications and GUI-only parameter
+  setters. GUI build resets temporary editing state when the window reopens.
+- Selected rtrb 0.3.5 as the compatible maintenance update rather than the
+  breaking 0.4 series. The worker continued to use individual push/pop operations.
+- Retained DeepFilterNet 0.5.6, ndarray 0.15.6, Tract 0.19.16, and rubato
+  0.14.1 to preserve the existing inference/resampling compatibility boundary.
+  Rust 1.95 is required by the updated egui dependency; validation used 1.98.1.
+- Confirmed all four embedded font license texts were unchanged in
+  epaint_default_fonts 0.36.2. Updated harfrust attribution and added try-lock's
+  MIT notice; removed the no-longer-resolved memoffset entry.
+- All 31 library tests and allocation-asserting pluginval strictness 5 passed
+  after the upgrade. Optimized VST3/CLAP bundles were packaged with verified
+  arm64 architecture, ad-hoc signatures, ZIP integrity, and SHA-256 output.
+- Dependency-upgrade acceptance and artifact provenance are tracked under
+  I13/V13 in `PLANS.md`. The plugin remained version 0.7.0; the package used
+  the `0.7.0-deps-20260926` suffix to preserve the previous archive. This build
+  was neither installed nor published. Existing installed binaries, paced-host
+  probe measurements, and Resolve evidence predated this migration.
+
 - Updated the plugin from 0.6.0 to 0.7.0, rebuilt both formats, and confirmed
   the actual exported plugin descriptor reports 0.7.0. The bundler's generic
   Info.plist version is independent of the host-facing plugin VERSION.

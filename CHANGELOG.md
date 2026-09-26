@@ -26,6 +26,14 @@
 
 ### Changed
 
+- Upgraded nice-plug to 0.4.2, nice-plug-egui to 0.5.1, egui to 0.36.2,
+  rtrb to 0.3.5, and log to 0.4.34. Migrated activation and editor integration
+  while preserving plugin identities, DSP behavior, and the fixed two-control UI.
+- Raised the documented build requirement to Rust 1.95 for the current
+  editor dependencies.
+- Updated third-party notices for the resolved editor dependencies and
+  confirmed that the embedded font license texts remained unchanged.
+
 - Updated the plug-in version from 0.6.0 to 0.7.0.
 
 - Consolidated implementation tracking in `PLANS.md` and replaced repeated

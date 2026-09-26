@@ -19,6 +19,13 @@ Project instructions for coding agents working in this repository.
 ## DSP and build invariants
 
 - Use nice-plug and nice-plug-xtask. Do not reintroduce nih-plug.
+- Keep nice-plug, nice-plug-egui, and egui on compatible versions when updating
+  `plugin/Cargo.toml` and `Cargo.lock`. The current editor requires Rust 1.95
+  or later. Use `Plugin::activate`/`ActivateContext` and the concrete
+  `Plugin::Editor` associated type for the current framework.
+- Treat DeepFilterNet, ndarray, Tract, and rubato as a shared compatibility
+  boundary; assess model APIs and resampling/latency behavior before upgrading
+  them independently.
 - Enable exactly one embedded model feature. The default is `model-ll`, and
   the alternate build is `--no-default-features --features model-standard`.
   Keep DeepFilterNet default features disabled so both models are never
@@ -50,6 +57,9 @@ Project instructions for coding agents working in this repository.
   controls unless the user explicitly expands the UI scope.
 - Keep GUI work outside the audio callback and route slider gestures through
   nice-plug's parameter setter so host automation remains synchronized.
+- In `plugin/src/editor.rs`, preserve the `NiceEguiApp` lifecycle and the
+  framework's `RepaintNotifier` integration so host automation repaints the UI.
+  Reset temporary text-entry and drag state when the editor is reopened.
 
 ## Release packaging
 

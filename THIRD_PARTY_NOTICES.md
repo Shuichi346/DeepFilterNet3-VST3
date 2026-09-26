@@ -9,7 +9,7 @@ license. This notice does not grant or confirm model redistribution rights.
 ## Embedded GUI fonts
 
 The custom editor embeds Hack Regular, Noto Emoji, Ubuntu Light, and Emoji
-Icon Font through `epaint_default_fonts` 0.35.0. Their required MIT, Bitstream
+Icon Font through `epaint_default_fonts` 0.36.2. Their required MIT, Bitstream
 Vera, SIL Open Font License 1.1, and Ubuntu Font Licence 1.0 notices are in
 `third-party-licenses/Embedded-Font-Licenses.txt`.
 
@@ -28,8 +28,7 @@ The default binary also contains MIT-licensed code from these components:
 - `block2` 0.5.1 and 0.6.2 — Mads Marquart
 - `crunchy` 0.2.4 — Copyright 2017-2023 Eira Fransham
 - `dpi` 0.1.2 and `libm` 0.2.16
-- `harfrust` 0.7.0 — HarfBuzz developers; Copyright (c) 2020 Yevhenii Reizner
-- `memoffset` 0.9.1 — Copyright (c) 2017 Gilad Naaman
+- `harfrust` 0.12.0 — HarfBuzz developers; Copyright (c) 2020 Yevhenii Reizner
 - `nom` 7.1.3 — Copyright (c) 2014-2019 Geoffroy Couprie
 - `objc2` 0.5.2/0.6.4, `objc2-encode` 4.1.0, `objc-sys` 0.3.5, and the
   included `objc2` framework crates — Mads Marquart
@@ -42,6 +41,7 @@ The default binary also contains MIT-licensed code from these components:
 - `simd-adler32` 0.3.10 — Copyright (c) 2021 Marvin Countryman
 - `tracing`, `tracing-appender`, `tracing-core`, `tracing-log`, and
   `tracing-subscriber` — Copyright (c) 2019 Tokio Contributors
+- `try-lock` 0.2.5 — Copyright (c) 2018-2023 Sean McArthur; Copyright (c) 2016 Alex Crichton
 - `zmij` 1.0.23 — David Tolnay
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
