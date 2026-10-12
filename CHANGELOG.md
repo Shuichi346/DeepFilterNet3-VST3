@@ -1,6 +1,8 @@
 # Changelog
 
-## Fixed
+## DATE UNKNOWN
+
+### Fixed
 
 - Corrected Attenuation Limit smoothing so a 50 ms change no longer takes
   seconds when the host uses larger blocks.
@@ -13,7 +15,7 @@
 - Made initialization failures select direct bypass instead of rejecting
   non-48 kHz hosts or producing silence.
 
-## Added
+### Added
 
 - Added a continuous one-channel DeepFilterNet worker pipeline for mono and
   stereo hosts, with lock-free callback transport, generation-based resets,
@@ -35,7 +37,7 @@
 - Added the required embedded GUI font notices and license texts to the
   repository and release-package inventory.
 
-## Changed
+### Changed
 
 - Upgraded nice-plug to 0.4.2, nice-plug-egui to 0.5.1, egui to 0.36.2,
   rtrb to 0.3.5, and log to 0.4.34. Migrated activation and editor integration
