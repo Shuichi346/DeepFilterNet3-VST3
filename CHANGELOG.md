@@ -1,8 +1,19 @@
 # Changelog
 
-## Unreleased
+## Fixed
 
-### Added
+- Corrected Attenuation Limit smoothing so a 50 ms change no longer takes
+  seconds when the host uses larger blocks.
+- Sized the reported processing delay for the host's maximum block size,
+  preventing routine large callbacks from losing noise reduction to dry fallback.
+- Restored enhancement automatically after input queue overload while preserving
+  the stereo dry timeline and rejecting stale worker output.
+- Made logical reset equivalent to a fresh model run and prevented pre-reset,
+  late, or discontinuous worker output from entering a new host generation.
+- Made initialization failures select direct bypass instead of rejecting
+  non-48 kHz hosts or producing silence.
+
+## Added
 
 - Added a continuous one-channel DeepFilterNet worker pipeline for mono and
   stereo hosts, with lock-free callback transport, generation-based resets,
@@ -24,7 +35,7 @@
 - Added the required embedded GUI font notices and license texts to the
   repository and release-package inventory.
 
-### Changed
+## Changed
 
 - Upgraded nice-plug to 0.4.2, nice-plug-egui to 0.5.1, egui to 0.36.2,
   rtrb to 0.3.5, and log to 0.4.34. Migrated activation and editor integration
@@ -33,9 +44,7 @@
   editor dependencies.
 - Updated third-party notices for the resolved editor dependencies and
   confirmed that the embedded font license texts remained unchanged.
-
 - Updated the plug-in version from 0.6.0 to 0.7.0.
-
 - Consolidated implementation tracking in `PLANS.md` and replaced repeated
   verification gates with checks scoped to the affected behavior and artifacts.
 - Changed the project and plug-in release version to 0.5.0.
@@ -50,17 +59,3 @@
 - Moved model inference and persistent sample-rate conversion off the audio
   callback and aligned missing or degraded wet output with the delayed dry
   timeline instead of emitting stale or silent audio.
-
-### Fixed
-
-- Corrected Attenuation Limit smoothing so a 50 ms change no longer takes
-  seconds when the host uses larger blocks.
-- Sized the reported processing delay for the host's maximum block size,
-  preventing routine large callbacks from losing noise reduction to dry fallback.
-- Restored enhancement automatically after input queue overload while preserving
-  the stereo dry timeline and rejecting stale worker output.
-
-- Made logical reset equivalent to a fresh model run and prevented pre-reset,
-  late, or discontinuous worker output from entering a new host generation.
-- Made initialization failures select direct bypass instead of rejecting
-  non-48 kHz hosts or producing silence.
